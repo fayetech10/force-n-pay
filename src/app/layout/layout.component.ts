@@ -11,7 +11,6 @@ import { ActivatedRoute, NavigationEnd, Router, RouterModule, RouterOutlet } fro
 import { AuthService } from '../services/auth.service';
 import { filter, map, mergeMap, Observable, Subject, Subscription, takeUntil } from 'rxjs';
 import { PageInfo } from '../interfaces/InfoPages';
-import { User } from '../interfaces/User';
 import { PageTitleService } from '../services/components/page.title.service';
 
 @Component({

@@ -1,6 +1,6 @@
 import { SelectionModel } from '@angular/cdk/collections';
-import { CommonModule, DatePipe } from '@angular/common';
-import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { CommonModule, DatePipe, TitleCasePipe } from '@angular/common';
+import { Component, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -23,16 +23,17 @@ import { MissionService } from '../../services/missions.service';
 import { Mission } from '../../interfaces/Mission';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ActivatedRoute } from '@angular/router';
-import { map, Observable, tap } from 'rxjs';
+import { map, Observable, Subscription, tap } from 'rxjs';
 import { BaseChartDirective } from 'ng2-charts';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { User } from '../../interfaces/User';
+import { UserService } from '../../services/users.service';
 
-
-
-interface User {
-  id: number;
-  name: string;
-  role: string;
-}
+// interface User {
+//   id: number;
+//   name: string;
+//   role: string;
+// }
 
 @Component({
   selector: 'app-mission-management',
@@ -57,18 +58,32 @@ interface User {
     FormsModule,
     ReactiveFormsModule,
     DatePipe,
-    MatProgressSpinnerModule
-
+    MatProgressSpinnerModule,
+    TitleCasePipe,
   ],
+  standalone: true,
   templateUrl: './mission-management.component.html',
-  styleUrls: ['./mission-management.component.scss']  // Corrigé : styleUrl -> styleUrls
+  styleUrls: ['./mission-management.component.scss']
 })
-export class MissionManagementComponent implements OnInit {
+export class MissionManagementComponent implements OnInit, OnDestroy {
   objectif: any;
   missionsFronApi: Mission[] = [];
-  isLoading = false
-  statusColor(_t289: string) {
-    throw new Error('Method not implemented.');
+  isLoading = false;
+  typeOptions = [
+    "Informatiques",
+    "Sante",
+    "Education",
+    "Religieux"
+  ];
+  isSaving!: boolean;
+
+  statusColor(status: string) {
+    switch (status) {
+      case 'En Cour': return 'blue';
+      case 'Termine': return 'green';
+      case 'En attente': return 'gray';
+      default: return 'gray';
+    }
   }
 
   @ViewChild('missionDialog') missionDialog!: TemplateRef<any>;
@@ -102,7 +117,6 @@ export class MissionManagementComponent implements OnInit {
       }
     }
   };
-
 
   chartData: ChartData = {
     labels: ['Jan', 'Feb', 'Mar', 'Apr'],
@@ -147,92 +161,97 @@ export class MissionManagementComponent implements OnInit {
         backgroundColor: ['#facc15', '#f87171', '#34d399']
       }
     ]
-  }
-
+  };
 
   // Données utilisateurs
-  users: User[] = [
-    { id: 1, name: 'Jean Dupont', role: "admin" },
-    { id: 2, name: 'Marie Martin', role: "Consultant" },
-    { id: 3, name: 'Pierre Durand', role: "Consultant" },
-    { id: 4, name: 'Sophie Lefebvre', role: "Consultant" },
-    { id: 5, name: 'Thomas Bernard', role: "Consultant" }
-  ];
+  // users: User[] = [
+  //   { id: 1, name: 'Jean Dupont', role: "admin" },
+  //   { id: 2, name: 'Marie Martin', role: "Consultant" },
+  //   { id: 3, name: 'Pierre Durand', role: "Consultant" },
+  //   { id: 4, name: 'Sophie Lefebvre', role: "Consultant" },
+  //   { id: 5, name: 'Thomas Bernard', role: "Consultant" }
+  // ];
+  users$!: Observable<User[]>
+  users: User[] = []
+
   statusOptions = [
     "En Cour",
     "Termine",
     "En attente"
   ];
 
-  missions$!: Observable<Mission[]>
+  missions$!: Observable<Mission[]>;
 
   constructor(
     private readonly dialog: MatDialog,
     private readonly fb: FormBuilder,
     private readonly missionService: MissionService,
-    private readonly route: ActivatedRoute
+    private readonly route: ActivatedRoute,
+    private readonly snackbar: MatSnackBar,
+    private readonly userService: UserService
   ) { }
-
+  private subscription?: Subscription;
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
+  }
 
   ngOnInit(): void {
     this.initMissionForm();
-    // this.loadMissions();
-    // this.loadMissionFromApi()
-    this.loadMissionByResolver()
+    this.loadMissionByResolver();
+    this.loadUsers()
   }
+  loadUsers(): void {
+    this.users$ = this.userService.getAllUsers()
+
+
+    this.users$.subscribe({
+      next: (users) => {
+        this.users = users
+      }
+    })
+  }
+
   loadMissionByResolver(): void {
-    this.isLoading = true
+    this.isLoading = true;
     this.missions$ = this.route.data.pipe(
       map(data => data['missions']),
 
       tap(() => this.isLoading = false)
-    )
 
-    this.missions$.subscribe(missions => {
-      this.missions.data = missions
-    },
+    );
+
+    this.missions$.subscribe(
+      missions => {
+        this.missions.data = missions;
+      },
       error => {
         console.error("Erreur lors du chargement des missions", error);
         this.isLoading = false;
       }
-    )
-
-
+    );
   }
-  // loadMissionFromApi(): void {
-  //   this.isLoading = true
-  //   this.missionService.getMission().subscribe({
-  //     next: (missions: Mission[]) => {
-  //       this.missionsFronApi = missions
-  //       this.loadMissions()
-  //       this.isLoading = false
-  //       console.log(this.missionsFronApi)
-  //     },
-  //     error: (err) => {
-  //       console.log("Error lors du chargement des mission", err.message)
-  //       this.isLoading = false
-  //     }
-  //   })
-  // }
-
-
 
   initMissionForm(): void {
     this.missionForm = this.fb.group({
       name: ['', Validators.required],
+      type: [''],
       description: [''],
-      status: ['En cours', Validators.required],
-      assignee: ['', Validators.required],
-      startDate: [new Date(), Validators.required],
-      endDate: [null],
-      progress: [0]
-    });
+      status_paiement: [''],
+      status_mission: ['', Validators.required],
+      objectif: [''],
+      dateDebut: ['', Validators.required],
+      dateFin: [''],
+      budget: [0],
+      progress: [0],
+      utilisateur: [null, Validators.required]
+    })
+
   }
 
   loadMissions(): void {
     // Simuler le chargement des données depuis une API
-    this.missions.data = [...this.missionsFronApi]
-    this.missions._updateChangeSubscription()
+    this.missions.data = [...this.missionsFronApi];
+    this.missions._updateChangeSubscription();
   }
 
   // Gestion de la sélection dans le tableau
@@ -256,10 +275,15 @@ export class MissionManagementComponent implements OnInit {
   }
 
   // Gestion des missions
-  openMissionDialog(): void {
-    this.editMode = false;
-    this.currentMissionId = null;
-    this.initMissionForm();
+  openMissionDialog(mission?: Mission): void {
+    if (mission) {
+      this.editMode = true;
+      this.currentMissionId = mission.id;
+      this.missionForm.patchValue(mission);
+    } else {
+      this.editMode = false;
+      this.missionForm.reset();
+    }
     this.dialog.open(this.missionDialog, {
       width: '800px',
       maxWidth: "800px",
@@ -271,63 +295,58 @@ export class MissionManagementComponent implements OnInit {
     this.editMode = true;
     this.currentMissionId = mission.id;
 
-    this.missionForm.patchValue({
-      name: mission.name,
-      description: mission.description,
-      status: mission.status,
-      assignee: mission.assignee,
-      startDate: mission.startDate ? new Date(mission.startDate) : null,
-      endDate: mission.endDate ? new Date(mission.endDate) : null,
-    });
+    this.missionForm.patchValue(mission);
 
     this.dialog.open(this.missionDialog, {
-      width: '100%',
+      width: '800px',
+      maxWidth: "800px",
       disableClose: true
     });
   }
-
   saveMission(): void {
-    if (this.missionForm.invalid) {
-      return;
-    }
+    this.isSaving = true
+    if (this.missionForm.invalid) return;
 
-    const formData = this.missionForm.value;
+    const missionData: Mission = this.missionForm.value;
+    const operation$ = this.editMode && this.currentMissionId !== null
+      ? this.missionService.updateMission({ ...missionData, id: this.currentMissionId })
+      : this.missionService.addMission(missionData);
 
-    // Formatage des dates pour la démonstration
-    const formatDate = (date: Date) => {
-      if (!date) return null;
-      const day = date.getDate().toString().padStart(2, '0');
-      const month = (date.getMonth() + 1).toString().padStart(2, '0');
-      const year = date.getFullYear();
-      return `${day}/${month}/${year}`;
-    };
+    operation$.subscribe({
+      next: (savedMission) => {
+        this.refreshMissionsData(savedMission);
+        this.snackbar.open(`Mission ${this.editMode ? 'mise à jour' : 'ajoutée'} !`, 'Fermer', {
+          duration: 3000
+        });
+        this.dialog.closeAll();
+      },
+      error: (error) => {
+        console.error(`Erreur ${this.editMode ? 'mise à jour' : 'ajout'}`, error);
 
-    const missionData: Mission = {
-      id: this.editMode && this.currentMissionId ? this.currentMissionId : Math.floor(Math.random() * 1000) + 6,
-      name: formData.name,
-      description: formData.description,
-      status: formData.status,
-      assignee: formData.assignee,
-      startDate: formatDate(formData.startDate),
-      endDate: formatDate(formData.endDate),
-      // progress: formData.progress
-    };
-
-    // Mise à jour ou ajout de la mission
-    if (this.editMode && this.currentMissionId) {
-      const index = this.missions.data.findIndex(m => m.id === this.currentMissionId);
-      if (index !== -1) {
-        const updatedData = [...this.missions.data];
-        updatedData[index] = missionData;
-        this.missions.data = updatedData;
       }
-    } else {
-      this.missions.data = [...this.missions.data, missionData];
-    }
+    });
 
-    this.dialog.closeAll();
+    operation$.subscribe({
+      next: () => this.isSaving = false,
+      error: () => this.isSaving = false
+    });
+
+
   }
+  refreshMissionsData(updatedMission: Mission) {
+    this.missionService.getMissions().subscribe(missions => {
+      const dataSource = this.missions.data;
 
+      if (this.editMode) {
+        const index = dataSource.findIndex(m => m.id === updatedMission.id);
+        if (index > -1) dataSource[index] = updatedMission;
+      } else {
+        dataSource.push(updatedMission);
+      }
+
+      this.missions.data = [...dataSource];
+    });
+  }
   viewMissionDetails(mission: Mission): void {
     // Implémentation pour voir les détails de la mission
     console.log('Voir détails de la mission:', mission);
@@ -345,5 +364,9 @@ export class MissionManagementComponent implements OnInit {
     if (confirm(`Êtes-vous sûr de vouloir supprimer la mission "${mission.name}" ?`)) {
       this.missions.data = this.missions.data.filter(m => m.id !== mission.id);
     }
+  }
+
+  getUserById(userId: number): User | undefined {
+    return this.users.find(user => user.id === userId);
   }
 }

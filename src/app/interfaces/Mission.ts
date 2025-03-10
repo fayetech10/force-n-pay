@@ -1,10 +1,16 @@
-export interface Mission{
- 
-     id: number;
+export interface Mission {
+      id: number;
       name: string;
+      type: string;
       description: string;
-      status: 'En cours' | 'Terminée' | 'En attente';
-      assignee: string;
-      startDate: string | null;
-      endDate: string | null;
+      status_paiement: string;
+      status_mission: string;
+      objectif: string;
+      dateDebut: string;
+      dateFin: string;
+      budget: number;
+      progress: number;
+      utilisateur: {
+            id: number;
+      };
 }

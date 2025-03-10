@@ -15,14 +15,12 @@
         </button>
     </div>
 
-   
-
     <!-- Graphique des missions -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <mat-card class="rounded-xl shadow-sm p-6">
             <h2 class="text-lg font-bold mb-4">État des Missions</h2>
             <div class="h-64">
-                <canvas baseChart [data]="missionChartData" [type]="'line'" [options]="">
+                <canvas baseChart [data]="missionChartData" [type]="'doughnut'" [options]="chartOptions">
                 </canvas>
             </div>
             <div class="grid grid-cols-3 text-center mt-4">
@@ -57,44 +55,44 @@
             </div>
         </mat-card>
     </div>
-<!-- Filtres et recherche -->
-<mat-card class="rounded-xl shadow-sm mb-6">
-    <div class="p-6">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <mat-form-field class="w-full">
-                <mat-label>Rechercher</mat-label>
-                <input matInput placeholder="Nom, ID, utilisateur..." [(ngModel)]="searchQuery">
-                <mat-icon matSuffix>search</mat-icon>
-            </mat-form-field>
+    <!-- Filtres et recherche -->
+    <mat-card class="rounded-xl shadow-sm mb-6">
+        <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <mat-form-field class="w-full">
+                    <mat-label>Rechercher</mat-label>
+                    <input matInput placeholder="Nom, ID, utilisateur..." [(ngModel)]="searchQuery">
+                    <mat-icon matSuffix>search</mat-icon>
+                </mat-form-field>
 
-            <mat-form-field class="w-full">
-                <mat-label>Statut</mat-label>
-                <mat-select [(ngModel)]="filterStatus">
-                    <mat-option value="">Tous</mat-option>
-                    <mat-option value="En cours">En cours</mat-option>
-                    <mat-option value="Terminée">Terminée</mat-option>
-                    <mat-option value="En attente">En attente</mat-option>
-                </mat-select>
-            </mat-form-field>
+                <mat-form-field class="w-full">
+                    <mat-label>Statut</mat-label>
+                    <mat-select [(ngModel)]="filterStatus">
+                        <mat-option value="">Tous</mat-option>
+                        <mat-option *ngFor="let status of statusOptions" [value]="status">
+                            {{ status }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
 
-            <mat-form-field class="w-full">
-                <mat-label>Date</mat-label>
-                <input matInput [matDatepicker]="picker" placeholder="Choisir une date">
-                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-                <mat-datepicker #picker></mat-datepicker>
-            </mat-form-field>
+                <mat-form-field class="w-full">
+                    <mat-label>Date</mat-label>
+                    <input matInput [matDatepicker]="picker" placeholder="Choisir une date">
+                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-datepicker #picker></mat-datepicker>
+                </mat-form-field>
 
-            <div class="flex items-center space-x-2">
-                <button mat-stroked-button class="flex-1">
-                    <mat-icon>filter_list</mat-icon> Filtrer
-                </button>
-                <button mat-stroked-button class="flex-1">
-                    <mat-icon>refresh</mat-icon> Réinitialiser
-                </button>
+                <div class="flex items-center space-x-2">
+                    <button mat-stroked-button class="flex-1">
+                        <mat-icon>filter_list</mat-icon> Filtrer
+                    </button>
+                    <button mat-stroked-button class="flex-1">
+                        <mat-icon>refresh</mat-icon> Réinitialiser
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
-</mat-card>
+    </mat-card>
     <!-- Tableau des missions -->
     <mat-card class="rounded-xl shadow-sm">
         <div class="overflow-x-auto">
@@ -102,15 +100,10 @@
                 <!-- Checkbox Column -->
                 <ng-container matColumnDef="select">
                     <th mat-header-cell *matHeaderCellDef class="w-12 px-6 py-3">
-                        <mat-checkbox (change)="$event ? masterToggle() : null"
-                            [checked]="selection.hasValue() && isAllSelected()"
-                            [indeterminate]="selection.hasValue() && !isAllSelected()">
-                        </mat-checkbox>
+
                     </th>
                     <td mat-cell *matCellDef="let row" class="px-6 py-4">
-                        <mat-checkbox (click)="$event.stopPropagation()"
-                            (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)">
-                        </mat-checkbox>
+
                     </td>
                 </ng-container>
 
@@ -128,7 +121,7 @@
                     <td mat-cell *matCellDef="let mission" class="px-6 py-4">
                         <div class="font-medium">{{mission.name}}</div>
                         <div class="text-xs text-gray-500 dark:text-gray-400">{{mission.description |
-                            slice:0:60}}{{mission.description.length > 60 ? '...' : ''}}</div>
+                            slice:0:60}}{{mission.description && mission.description.length > 60 ? '...' : ''}}</div>
                     </td>
                 </ng-container>
 
@@ -138,8 +131,8 @@
                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400"> Statut </th>
                     <td mat-cell *matCellDef="let mission" class="px-6 py-4">
                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full" [ngClass]="{
-                    'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200': mission.status_mission === 'Terminée',
-                    'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200': mission.status_mission === 'En cours',
+                    'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200': mission.status_mission === 'Termine',
+                    'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200': mission.status_mission === 'En Cour',
                     'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200': mission.status_mission === 'En attente'
                   }">
                             {{mission.status_mission}}
@@ -158,7 +151,8 @@
                                 class="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300 mr-2">
                                 <mat-icon class="text-sm">person</mat-icon>
                             </div>
-                            <span>{{mission.utilisateur.nom}}</span>
+                            <span>{{ mission.nom ? (getUserById(mission.utilisateur)?.nom | titlecase) : '-'
+                                }}</span>
                         </div>
                     </td>
                 </ng-container>
@@ -187,14 +181,14 @@
                     <td mat-cell *matCellDef="let mission" class="px-6 py-4">
                         <div class="flex items-center">
                             <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mr-2">
-                                <div class="h-2 rounded-full" [style.width.%]="mission.progress" [ngClass]="{
-                       'bg-blue-500': mission.status_mission === 'En cours',
-                       'bg-green-500': mission.status_mission === 'Terminée',
+                                <div class="h-2 rounded-full" [style.width.%]="mission.progress || 0" [ngClass]="{
+                       'bg-blue-500': mission.status_mission === 'En Cour',
+                       'bg-green-500': mission.status_mission === 'Termine',
                        'bg-gray-400': mission.status_mission === 'En attente'
                      }">
                                 </div>
                             </div>
-                            <span class="text-sm">{{mission.progress}}%</span>
+                            <span class="text-sm">{{mission.progress || 0}}%</span>
                         </div>
                     </td>
                 </ng-container>
@@ -263,11 +257,49 @@
             <!-- Statut -->
             <mat-form-field appearance="fill" class="w-full">
                 <mat-label>Statut</mat-label>
-                <mat-select formControlName="status" required>
-                    <mat-option value="En cours">En cours</mat-option>
-                    <mat-option value="Terminée">Terminée</mat-option>
-                    <mat-option value="En attente">En attente</mat-option>
+                <mat-select formControlName="status_mission" required>
+                    <mat-option *ngFor="let status of statusOptions" [value]="status">
+                        {{status}}
+                    </mat-option>
                 </mat-select>
+            </mat-form-field>
+
+            <!-- Description -->
+            <mat-form-field appearance="fill" class="w-full md:col-span-2">
+                <mat-label>Description</mat-label>
+                <textarea matInput formControlName="description" rows="3"></textarea>
+            </mat-form-field>
+
+            <!-- Assigné à -->
+            <mat-form-field appearance="fill" class="w-full">
+                <mat-label>Assigné à</mat-label>
+                <mat-select formControlName="utilisateur" required>
+                    <mat-option *ngFor="let user of users" [value]="user.id">
+                        {{ user.nom }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <!-- Dates -->
+            <mat-form-field appearance="fill" class="w-full">
+                <mat-label>Date de début</mat-label>
+                <input matInput [matDatepicker]="startPicker" formControlName="dateDebut" required>
+                <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+                <mat-datepicker #startPicker></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill" class="w-full">
+                <mat-label>Date de fin</mat-label>
+                <input matInput [matDatepicker]="endPicker" formControlName="dateFin">
+                <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+                <mat-datepicker #endPicker></mat-datepicker>
+            </mat-form-field>
+
+            <!-- Budget -->
+            <mat-form-field appearance="fill" class="w-full">
+                <mat-label>Budget (€)</mat-label>
+                <input matInput type="number" formControlName="budget" min="0">
+                <span matSuffix>€</span>
             </mat-form-field>
 
             <!-- Objectif -->
@@ -276,42 +308,14 @@
                 <textarea matInput formControlName="objectif" rows="3"></textarea>
             </mat-form-field>
 
-            <!-- Assigné à -->
+            <!-- Type -->
             <mat-form-field appearance="fill" class="w-full">
-                <mat-label>Assigné à</mat-label>
-                <mat-select formControlName="assignee" required>
-                    <mat-option *ngFor="let user of users" [value]="user.id">
-                        {{ user.name }}
+                <mat-label>Type</mat-label>
+                <mat-select formControlName="type" required>
+                    <mat-option *ngFor="let type of typeOptions" [value]="type">
+                        {{type}}
                     </mat-option>
                 </mat-select>
-            </mat-form-field>
-
-            <!-- Dates -->
-            <mat-form-field appearance="fill" class="w-full">
-                <mat-label>Date de début</mat-label>
-                <input matInput [matDatepicker]="startPicker" formControlName="startDate" required>
-                <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
-                <mat-datepicker #startPicker></mat-datepicker>
-            </mat-form-field>
-
-            <mat-form-field appearance="fill" class="w-full">
-                <mat-label>Date de fin</mat-label>
-                <input matInput [matDatepicker]="endPicker" formControlName="endDate">
-                <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
-                <mat-datepicker #endPicker></mat-datepicker>
-            </mat-form-field>
-
-            <!-- Budget -->
-            <mat-form-field appearance="fill" class="w-full">
-                <mat-label>Budget (€)</mat-label>
-                <input matInput type="number" formControlName="budget">
-                <span matPrefix>€&nbsp;</span>
-            </mat-form-field>
-
-            <!-- Description -->
-            <mat-form-field appearance="fill" class="w-full md:col-span-2">
-                <mat-label>Description</mat-label>
-                <textarea matInput formControlName="description" rows="4"></textarea>
             </mat-form-field>
 
             <!-- Actions -->

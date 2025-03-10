@@ -13,7 +13,7 @@ export class MissionResolver implements Resolve<Mission[]> {
     constructor(private readonly missionService: MissionService) { }
     resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Mission[]> {
 
-        return this.missionService.getMission()
+        return this.missionService.getMissions()
 
     }
 

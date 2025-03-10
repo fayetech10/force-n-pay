@@ -16,8 +16,9 @@
                             <mat-icon class="text-blue-500 dark:text-blue-400">person</mat-icon>
                         </div> -->
                         <div>
-                            <h3 class="font-medium text-gray-800 dark:text-gray-100">{{user$.username | titlecase}}</h3>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">{{user$.role[0]}}</p>
+                            <h3 class="font-medium text-gray-800 dark:text-gray-100">{{user$?.username | titlecase}}
+                            </h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">{{user$?.role[0]}}</p>
                         </div>
                     </div>
                 </div>
@@ -49,7 +50,7 @@
                             </h2>
                             <span *ngIf="currentPage?.subtitle"
                                 class="ml-2 px-2 py-1 text-xs rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
-                                {{ currentPage.subtitle }}
+                                {{ currentPage?.subtitle }}
                             </span>
                         </div>
                     </div>
