@@ -1,0 +1,134 @@
+<div class="min-h-screen bg-red-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
+    <mat-sidenav-container class="h-screen">
+        <!-- Sidebar -->
+        <mat-sidenav #sidenav mode="side" opened
+            class="w-64 border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm">
+            <div class="p-4 flex items-center flex-col border-b border-gray-200 dark:border-gray-700">
+                <img src="assets/logo.png" alt="Logo" class="h-20 w-full  rounded-lg">
+                <h1 class="text-xl font-bold text-gray-800  dark:text-gray-100">DashBoard</h1>
+            </div>
+
+            <div class="py-4">
+                <div class="px-4 mb-6">
+                    <div class="flex items-center space-x-3 mb-2">
+                        <!-- <div
+                            class="h-10 w-10 rounded-full bg-blue-500/10 dark:bg-blue-500/20 flex items-center justify-center">
+                            <mat-icon class="text-blue-500 dark:text-blue-400">person</mat-icon>
+                        </div> -->
+                        <div>
+                            <h3 class="font-medium text-gray-800 dark:text-gray-100">{{user$.username | titlecase}}</h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">{{user$.role[0]}}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <nav class="space-y-1">
+                    <a *ngFor="let nav of navigation" [routerLink]="nav.path"
+                        routerLinkActive="bg-blue-50/50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-300 border-l-4 border-blue-500"
+                        class="flex items-center px-4 py-2.5 mx-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                        <mat-icon class="mr-3 text-lg">{{nav.icon}}</mat-icon>
+                        <span class="text-sm font-medium">{{nav.title}}</span>
+                    </a>
+                </nav>
+            </div>
+        </mat-sidenav>
+
+        <!-- Main Content -->
+        <mat-sidenav-content class="bg-gray-50 dark:bg-gray-900">
+            <mat-toolbar
+                class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 h-16 shadow-sm">
+                <div class="flex items-center justify-between w-full">
+                    <div class="flex items-center gap-4">
+                        <button mat-icon-button (click)="sidenav.toggle()"
+                            class="text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors rounded-full">
+                            <mat-icon class="icon-outlined">menu</mat-icon>
+                        </button>
+                        <div class="flex items-center">
+                            <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100">
+                                {{ currentPage?.title || 'Dashboard' }}
+                            </h2>
+                            <span *ngIf="currentPage?.subtitle"
+                                class="ml-2 px-2 py-1 text-xs rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                                {{ currentPage.subtitle }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center ml-6">
+                        <div *ngIf="user$ | async as user" class="mr-6 hidden md:block">
+                            <h3 class="font-medium text-gray-800 dark:text-gray-100">{{user$.username | titlecase}}</h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">{{user$.role[0]}}</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center space-x-3">
+                        <button mat-icon-button [matMenuTriggerFor]="notificationsMenu"
+                            class="text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors rounded-full"
+                            [matBadge]="unreadNotifications" [matBadgeHidden]="unreadNotifications === 0"
+                            matBadgeColor="accent">
+                            <mat-icon class="icon-outlined">notifications</mat-icon>
+                        </button>
+                        <button mat-icon-button (click)="toggleDarkMode()"
+                            class="text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors rounded-full">
+                            <mat-icon class="icon-outlined"
+                                [ngClass]="{'text-amber-500': isDarkMode, 'text-indigo-500': !isDarkMode}">
+                                {{ isDarkMode ? 'light_mode' : 'dark_mode' }}
+                            </mat-icon>
+                        </button>
+                        <button mat-icon-button [matMenuTriggerFor]="userMenu"
+                            class="text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors rounded-full">
+                            <div
+                                class="h-9 w-9 rounded-full bg-blue-500/10 dark:bg-blue-500/20 flex items-center justify-center overflow-hidden">
+                                <img *ngIf="(user$ | async)" [src]="(user$ | async)" alt="Avatar utilisateur"
+                                    class="h-full w-full object-cover">
+                                <mat-icon *ngIf="!(user$ | async)"
+                                    class="text-blue-500 dark:text-blue-400">person</mat-icon>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </mat-toolbar>
+
+            <!-- Contenu -->
+            <div class="p-6">
+                <router-outlet></router-outlet>
+            </div>
+
+            <!-- Menus -->
+            <mat-menu #notificationsMenu="matMenu" class="w-80 [&_.mat-menu-content]:p-0">
+                <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                    <h3 class="text-sm font-semibold text-gray-800 dark:text-gray-100">Notifications</h3>
+                </div>
+                <div class="divide-y divide-gray-200 dark:divide-gray-700">
+                    <a *ngFor="let notif of notifications" href="#"
+                        class="block px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                        <div class="text-sm font-medium text-gray-800 dark:text-gray-100">{{notif.title}}</div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{notif.time}}</div>
+                    </a>
+                </div>
+                <div class="p-2 border-t border-gray-200 dark:border-gray-700">
+                    <a href="#"
+                        class="block text-center text-sm text-blue-500 hover:bg-gray-50 dark:hover:bg-gray-800 py-2 rounded">
+                        Voir toutes les notifications
+                    </a>
+                </div>
+            </mat-menu>
+
+            <mat-menu #userMenu="matMenu" class="min-w-[200px] [&_.mat-menu-content]:p-2">
+                <button mat-menu-item class="flex items-center h-10">
+                    <mat-icon class="icon-outlined mr-3">person</mat-icon>
+                    <span class="text-sm">Mon profil</span>
+                </button>
+                <button mat-menu-item class="flex items-center h-10">
+                    <mat-icon class="icon-outlined mr-3">settings</mat-icon>
+                    <span class="text-sm">Paramètres</span>
+                </button>
+                <div class="border-t border-gray-200 dark:border-gray-700 my-2"></div>
+                <button mat-menu-item class="flex items-center h-10 text-red-500" (click)="logOut()">
+                    <mat-icon class="icon-outlined mr-3">exit_to_app</mat-icon>
+                    <span class="text-sm">Déconnexion</span>
+                </button>
+            </mat-menu>
+        </mat-sidenav-content>
+    </mat-sidenav-container>
+</div>
