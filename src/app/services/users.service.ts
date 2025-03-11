@@ -9,6 +9,18 @@ import { Router } from "@angular/router";
 })
 
 export class UserService {
+    deleteUser(id: number):Observable<any> {
+      throw new Error('Method not implemented.');
+    }
+    updateUser(updatedUser: { actif: boolean; avatar: any; id: number; nom: string; prenom: string; username?: string | null; email: string; password?: string | null; telephone: string; adresse: string; dateNaissance: string | Date; rib?: string | null; qualifications: string[]; tauxRemuneration: number; role: string[]; }): Observable<any> {
+      throw new Error('Method not implemented.');
+    }
+    getAllQualifications() {
+      throw new Error('Method not implemented.');
+    }
+    getAllRoles() {
+      throw new Error('Method not implemented.');
+    }
     constructor(private http: HttpClient, private readonly router: Router) { }
 
     private baseUrl = '/api'
@@ -20,6 +32,7 @@ export class UserService {
         )
     }
 
+  
     private createAuthHeaders(): HttpHeaders {
         const token = this.getToken();
         if (!token) {

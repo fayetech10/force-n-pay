@@ -1,4 +1,11 @@
+import { User } from "./User";
+
 export interface Mission {
+priority: any;
+echeance: string|number|Date;
+lastProgressUpdate: string|number|Date;
+kpis: any;
+lastUpdate: string|number|Date;
       id: number;
       name: string;
       type: string;
@@ -10,7 +17,5 @@ export interface Mission {
       dateFin: string;
       budget: number;
       progress: number;
-      utilisateur: {
-            id: number;
-      };
+      utilisateur: User
 }

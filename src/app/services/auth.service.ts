@@ -61,14 +61,14 @@ export class AuthService {
 
     return throwError(() => ({ message: errorMessage }));
   }
-
+  getToken(): string | null {
+    return sessionStorage.getItem('token');
+  }
   saveToken(token: string): void {
     sessionStorage.setItem('token', token);
   }
 
-    getToken(): string | null {
-    return sessionStorage.getItem('token');
-  }
+  
 
   getUserFromToken(): User | null {
     const token = this.getToken();

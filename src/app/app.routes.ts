@@ -1,6 +1,6 @@
 import { Routes } from "@angular/router";
 import { MissionManagementComponent } from "./mission-management/components/mission-management.component";
-import { UserManagementComponent } from "./user-management/user-management.component";
+import { UserManagementComponent } from "./user-management/components/user-management.component";
 import { PaymentTrackingComponent } from "./payment-tracking/payment-tracking.component";
 import { MentorshipComponent } from "./mentorship/mentorship.component";
 import { ReportComponent } from "./report/report.component";
@@ -30,7 +30,7 @@ export const routes: Routes = [
         children: [
             { path: 'dashboard', component: ComponentsComponent },
             { path: '', loadChildren: () => import("./mission-management/mission.routes").then(m => m.MissionRoutes) },
-            { path: 'users', component: UserManagementComponent },
+            { path: '', loadChildren: () => import("./user-management/user.routes").then(m => m.UserRoute) },
             { path: 'reports', component: ReportComponent },
             { path: 'payments', component: PaymentTrackingComponent },
             { path: 'mentorship', component: MentorshipComponent }

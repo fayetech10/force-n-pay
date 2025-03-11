@@ -28,6 +28,7 @@ import { BaseChartDirective } from 'ng2-charts';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { User } from '../../interfaces/User';
 import { UserService } from '../../services/users.service';
+import { MissionDetailsComponentComponent } from '../../components/mission-details-component/mission-details-component.component';
 
 // interface User {
 //   id: number;
@@ -58,8 +59,10 @@ import { UserService } from '../../services/users.service';
     FormsModule,
     ReactiveFormsModule,
     DatePipe,
+
     MatProgressSpinnerModule,
     TitleCasePipe,
+
   ],
   standalone: true,
   templateUrl: './mission-management.component.html',
@@ -98,7 +101,7 @@ export class MissionManagementComponent implements OnInit, OnDestroy {
   filterStatus = '';
 
   // Tableau
-  displayedColumns: string[] = ['select', 'id', 'name', 'status', 'assignee', 'startDate', 'endDate', 'progress', 'actions'];
+  displayedColumns: string[] = ['id', 'name', 'status', 'assignee', 'startDate', 'endDate', 'progress', 'actions'];
   missions = new MatTableDataSource<Mission>([]);
   selection = new SelectionModel<Mission>(true, []);
 
@@ -163,16 +166,10 @@ export class MissionManagementComponent implements OnInit, OnDestroy {
     ]
   };
 
-  // Données utilisateurs
-  // users: User[] = [
-  //   { id: 1, name: 'Jean Dupont', role: "admin" },
-  //   { id: 2, name: 'Marie Martin', role: "Consultant" },
-  //   { id: 3, name: 'Pierre Durand', role: "Consultant" },
-  //   { id: 4, name: 'Sophie Lefebvre', role: "Consultant" },
-  //   { id: 5, name: 'Thomas Bernard', role: "Consultant" }
-  // ];
+
   users$!: Observable<User[]>
   users: User[] = []
+  filteredUsers: User[] = [];
 
   statusOptions = [
     "En Cour",
@@ -203,10 +200,10 @@ export class MissionManagementComponent implements OnInit, OnDestroy {
   loadUsers(): void {
     this.users$ = this.userService.getAllUsers()
 
-
     this.users$.subscribe({
+
       next: (users) => {
-        this.users = users
+        this.users = users.filter(user => user.nom && user.nom.trim() !== '')
       }
     })
   }
@@ -215,24 +212,25 @@ export class MissionManagementComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.missions$ = this.route.data.pipe(
       map(data => data['missions']),
-
       tap(() => this.isLoading = false)
 
     );
 
-    this.missions$.subscribe(
-      missions => {
-        this.missions.data = missions;
+    this.missions$.subscribe({
+      next: (missions) => {
+        this.missions.data = missions
+        this.isLoading = false
       },
-      error => {
-        console.error("Erreur lors du chargement des missions", error);
-        this.isLoading = false;
+      error: (err) => {
+        console.log("Erreur lors du chargement", err)
+        this.isLoading = false
       }
+    }
     );
   }
-
   initMissionForm(): void {
     this.missionForm = this.fb.group({
+      id: [null], // Optionnel, si présent
       name: ['', Validators.required],
       type: [''],
       description: [''],
@@ -241,33 +239,12 @@ export class MissionManagementComponent implements OnInit, OnDestroy {
       objectif: [''],
       dateDebut: ['', Validators.required],
       dateFin: [''],
-      budget: [0],
-      progress: [0],
+      budget: [0, [Validators.required, Validators.min(0)]],
+      progress: [0, [Validators.min(0), Validators.max(100)]],
       utilisateur: [null, Validators.required]
-    })
-
+    });
   }
 
-  loadMissions(): void {
-    // Simuler le chargement des données depuis une API
-    this.missions.data = [...this.missionsFronApi];
-    this.missions._updateChangeSubscription();
-  }
-
-  // Gestion de la sélection dans le tableau
-  isAllSelected(): boolean {
-    const numSelected = this.selection.selected.length;
-    const numRows = this.missions.data.length;
-    return numSelected === numRows;
-  }
-
-  masterToggle(): void {
-    if (this.isAllSelected()) {
-      this.selection.clear();
-    } else {
-      this.missions.data.forEach(row => this.selection.select(row));
-    }
-  }
 
   // Formatage des libellés
   formatProgressLabel(value: number): string {
@@ -294,9 +271,7 @@ export class MissionManagementComponent implements OnInit, OnDestroy {
   editMission(mission: Mission): void {
     this.editMode = true;
     this.currentMissionId = mission.id;
-
     this.missionForm.patchValue(mission);
-
     this.dialog.open(this.missionDialog, {
       width: '800px',
       maxWidth: "800px",
@@ -347,10 +322,18 @@ export class MissionManagementComponent implements OnInit, OnDestroy {
       this.missions.data = [...dataSource];
     });
   }
+
   viewMissionDetails(mission: Mission): void {
     // Implémentation pour voir les détails de la mission
     console.log('Voir détails de la mission:', mission);
-    // Ici, vous pourriez ouvrir un dialogue avec les détails ou naviguer vers une page dédiée
+    const dialRef = this.dialog.open(MissionDetailsComponentComponent, {
+      width: "1000px",
+      data: { mission }
+    })
+    dialRef.afterClosed().subscribe(result => {
+      console.log('Détails de la mission fermés');
+
+    })
   }
 
   downloadReport(mission: Mission): void {
@@ -362,7 +345,23 @@ export class MissionManagementComponent implements OnInit, OnDestroy {
   deleteMission(mission: Mission): void {
     // Confirmation de suppression (pourrait être implémenté avec un dialogue de confirmation)
     if (confirm(`Êtes-vous sûr de vouloir supprimer la mission "${mission.name}" ?`)) {
-      this.missions.data = this.missions.data.filter(m => m.id !== mission.id);
+      this.missionService.deleteMission(mission.id).subscribe({
+        next: () => {
+          this.snackbar.open("Mission supprimée avec succès !", 'Fermer', {
+            duration: 5000
+          });
+          // Filtre simplement le tableau existant
+          this.missions.data = this.missions.data.filter(m => m.id !== mission.id)
+        },
+        error: (error) => {
+          this.snackbar.open(`Une erreur s'est produite'!`, 'Fermer', {
+            duration: 3000
+          });
+          console.log(error);
+
+        }
+      })
+
     }
   }
 

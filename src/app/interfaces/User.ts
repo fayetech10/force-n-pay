@@ -1,4 +1,6 @@
 export interface User {
+    actif: any;
+    avatar: any;
     id: number;
     nom: string;
     prenom: string;
@@ -7,7 +9,7 @@ export interface User {
     password?: string | null;
     telephone: string;
     adresse: string;
-    dateNaissance?: string | null;
+    dateNaissance: string | Date;
     rib?: string | null;
     qualifications: string[];
     tauxRemuneration: number;

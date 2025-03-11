@@ -1,0 +1,120 @@
+<div class="bg-white rounded-xl shadow-lg overflow-hidden max-w-3xl mx-auto border border-gray-100">
+    <!-- Header with improved visual design -->
+    <div class="relative">
+        <div class="absolute top-0 right-0 h-2 w-full" [ngClass]="{
+      'bg-green-500': data.mission.status_mission === 'Termine',
+      'bg-blue-500': data.mission.status_mission === 'En Cours',
+      'bg-gray-300': data.mission.status_mission === 'En attente'
+    }"></div>
+
+        <div class="pt-6 px-6 pb-4">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h2 class="text-xl font-bold text-gray-800">{{ data.mission.name }}</h2>
+                    <div class="mt-1 flex items-center">
+                        <span class="inline-flex items-center text-sm text-gray-600">
+                            <mat-icon class="text-gray-400 mr-1" [inline]="true">category</mat-icon>
+                            {{ data.mission.type }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <div class="px-3 py-1 rounded-full text-sm font-medium" [ngClass]="{
+            'bg-green-50 text-green-700 border border-green-200': data.mission.status_mission === 'Termine',
+            'bg-blue-50 text-blue-700 border border-blue-200': data.mission.status_mission === 'En Cours',
+            'bg-gray-50 text-gray-700 border border-gray-200': data.mission.status_mission === 'En attente'
+          }">
+                        {{ data.mission.status_mission }}
+                    </div>
+
+                    <div class="px-3 py-1 rounded-full text-sm font-medium" [ngClass]="{
+            'bg-green-50 text-green-700 border border-green-200': data.mission.status_paiement === 'Paye',
+            'bg-red-50 text-red-700 border border-red-200': data.mission.status_paiement !== 'Paye'
+          }">
+                        {{ data.mission.status_paiement }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progression bar -->
+    <div class="px-6 py-3 bg-gray-50 border-t border-b border-gray-100">
+        <div class="flex items-center gap-3">
+            <div class="text-sm font-medium text-gray-600">Progression</div>
+            <div class="flex-grow">
+                <div class="h-2 rounded-full bg-gray-200 overflow-hidden">
+                    <div class="h-full" [ngStyle]="{'width': data.mission.progress + '%'}" [ngClass]="{
+            'bg-green-500': data.mission.status_mission === 'Termine',
+            'bg-blue-500': data.mission.status_mission === 'En Cours',
+            'bg-gray-400': data.mission.status_mission === 'En attente'
+          }"></div>
+                </div>
+            </div>
+            <div class="text-sm font-bold">{{ data.mission.progress }}%</div>
+        </div>
+    </div>
+
+    <!-- Content with better organization -->
+    <div class="p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+            <!-- Left column -->
+            <div class="space-y-5">
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Description</h3>
+                    <p class="text-gray-800 whitespace-pre-line">{{ data.mission.description }}</p>
+                </div>
+
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Objectif</h3>
+                    <p class="text-gray-800">{{ data.mission.objectif }}</p>
+                </div>
+            </div>
+
+            <!-- Right column with enhanced info cards -->
+            <div class="grid grid-cols-1 gap-4">
+                <div class="flex p-4 bg-white rounded-lg border border-gray-100 shadow-sm">
+                    <span class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-50 text-blue-600 mr-3">
+                        <mat-icon>person</mat-icon>
+                    </span>
+                    <div>
+                        <div class="text-xs font-medium text-gray-500 uppercase">Assigné à</div>
+                        <div class="mt-1 font-medium">{{ data.mission.utilisateur.prenom }} {{
+                            data.mission.utilisateur.nom }}</div>
+                    </div>
+                </div>
+
+                <div class="flex p-4 bg-white rounded-lg border border-gray-100 shadow-sm">
+                    <span
+                        class="flex items-center justify-center w-10 h-10 rounded-full bg-amber-50 text-amber-600 mr-3">
+                        <mat-icon>date_range</mat-icon>
+                    </span>
+                    <div>
+                        <div class="text-xs font-medium text-gray-500 uppercase">Période</div>
+                        <div class="mt-1 font-medium">{{ data.mission.dateDebut | date: 'dd/MM/yyyy' }} - {{
+                            data.mission.dateFin | date: 'dd/MM/yyyy' }}</div>
+                    </div>
+                </div>
+
+                <div class="flex p-4 bg-white rounded-lg border border-gray-100 shadow-sm">
+                    <span
+                        class="flex items-center justify-center w-10 h-10 rounded-full bg-green-50 text-green-600 mr-3">
+                        <mat-icon>euro_symbol</mat-icon>
+                    </span>
+                    <div>
+                        <div class="text-xs font-medium text-gray-500 uppercase">Budget</div>
+                        <div class="mt-1 font-medium">{{ data.mission.budget | currency:'EUR':'symbol':'1.0-0' }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex justify-end border-t border-gray-100 p-4 bg-gray-50">
+        <button mat-flat-button color="primary" class="rounded-full px-6" (click)="onClose()">
+            Fermer
+        </button>
+    </div>
+</div>

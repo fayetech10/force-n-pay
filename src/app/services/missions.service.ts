@@ -4,6 +4,7 @@ import { catchError, Observable, throwError } from "rxjs";
 import { environment } from "../../environments/environment";
 import { Mission } from "../interfaces/Mission";
 import { Router } from "@angular/router";
+import { AuthServiceConfig } from "./AuthServiceConfig";
 
 @Injectable({
     providedIn: "root"
@@ -14,15 +15,15 @@ export class MissionService {
 
     constructor(
         private http: HttpClient,
-        private router: Router
+        private authconfig: AuthServiceConfig
     ) { }
 
     // Récupère toutes les missions
     getMissions(): Observable<Mission[]> {
         return this.http.get<Mission[]>(
             `${this.baseUrl}/forc-n/v1/mission`,
-            { headers: this.createAuthHeaders() }
-        ).pipe(catchError(this.handleError));
+            { headers: this.authconfig.createAuthHeaders() }
+        ).pipe(catchError(this.authconfig.handleError));
     }
 
     // Ajoute une nouvelle mission
@@ -30,8 +31,8 @@ export class MissionService {
         return this.http.post<Mission>(
             `${this.baseUrl}/forc-n/v1/mission/add`,
             mission,
-            { headers: this.createAuthHeaders() }
-        ).pipe(catchError(this.handleError));
+            { headers: this.authconfig.createAuthHeaders() }
+        ).pipe(catchError(this.authconfig.handleError));
     }
 
     // Met à jour une mission existante
@@ -39,45 +40,16 @@ export class MissionService {
         return this.http.put<Mission>(
             `${this.baseUrl}/forc-n/v1/mission/update/${mission.id}`,
             mission,
-            { headers: this.createAuthHeaders() } // Ajout des headers manquants
-        ).pipe(catchError(this.handleError));
+            { headers: this.authconfig.createAuthHeaders() } // Ajout des headers manquants
+        ).pipe(catchError(this.authconfig.handleError));
     }
 
-    private createAuthHeaders(): HttpHeaders {
-        const token = this.getToken();
-        if (!token) {
-            this.handleMissingToken();
-            throw new Error('Token non disponible'); // Arrête l'exécution
-        }
-
-        return new HttpHeaders({
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        });
+    // Supprimer une mission
+    deleteMission(missionId: number): Observable<void> {
+        return this.http.delete<void>(`${this.baseUrl}/forc-n/v1/mission/${missionId}`, { headers: this.authconfig.createAuthHeaders() }).pipe(
+            catchError(this.authconfig.handleError),
+        )
     }
 
-    private getToken(): string | null {
-        return sessionStorage.getItem("token");
-    }
-
-    private handleMissingToken(): void {
-        console.error('Session expirée ou non authentifié');
-        sessionStorage.clear();
-        this.router.navigate(['/login']);
-    }
-
-    private handleError(error: HttpErrorResponse) {
-        let errorMessage = 'Une erreur est survenue';
-
-        if (error.status === 403) {
-            errorMessage = 'Accès refusé - Veuillez vous reconnecter';
-            this.handleMissingToken();
-        } else if (error.error instanceof ErrorEvent) {
-            console.error('Err  eur client:', error.error.message);
-        } else {
-            console.error(`Erreur serveur ${error.status}: ${error.message}`);
-        }
-
-        return throwError(() => new Error(errorMessage));
-    }
+  
 }

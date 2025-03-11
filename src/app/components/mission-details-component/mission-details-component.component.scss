@@ -1,0 +1,73 @@
+.progress-blue ::ng-deep .mat-progress-bar-fill::after {
+    background: linear-gradient(90deg, #3B82F6 0%, #6366F1 100%);
+}
+
+.progress-green ::ng-deep .mat-progress-bar-fill::after {
+    background: linear-gradient(90deg, #10B981 0%, #059669 100%);
+}
+
+.progress-gray ::ng-deep .mat-progress-bar-fill::after {
+    background: #6B7280;
+}
+
+.mat-progress-bar {
+    border-radius: 12px;
+}
+
+.mat-progress-bar-buffer {
+    background-color: #F3F4F6 !important;
+}
+
+/* Scrollbar stylisée */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+/* Personnalisation de la scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+    background: #f8fafc;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 20px;
+    border: 3px solid #f8fafc;
+}
+
+/* Animation des boutons */
+button {
+    transition: all 0.2s ease-in-out;
+}
+
+/* Effet hover sur les cartes */
+.bg-white:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* Dégradés pour les barres de progression */
+.progress-blue ::ng-deep .mat-progress-bar-fill {
+    background: linear-gradient(90deg, #3B82F6 0%, #6366F1 100%) !important;
+}
+
+.progress-green ::ng-deep .mat-progress-bar-fill {
+    background: linear-gradient(90deg, #10B981 0%, #059669 100%) !important;
+}
+
+.progress-gray ::ng-deep .mat-progress-bar-fill {
+    background: linear-gradient(90deg, #6B7280 0%, #4B5563 100%) !important;
+}

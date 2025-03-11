@@ -1,133 +1,204 @@
-<div class="min-h-screen bg-red-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
-    <mat-sidenav-container class="h-screen">
-        <!-- Sidebar -->
+<div
+    class="h-screen bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-900 dark:to-gray-800 text-gray-800 dark:text-gray-200">
+    <mat-sidenav-container class="h-full">
+        <!-- Sidebar avec défilement -->
         <mat-sidenav #sidenav mode="side" opened
-            class="w-64 border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm">
-            <div class="p-4 flex items-center flex-col border-b border-gray-200 dark:border-gray-700">
-                <img src="assets/logo.png" alt="Logo" class="h-20 w-full  rounded-lg">
-                <h1 class="text-xl font-bold text-gray-800  dark:text-gray-100">DashBoard</h1>
+            class="w-64 bg-white dark:bg-gray-800 shadow-xl border-0 flex flex-col">
+            <!-- Logo header (fixe) -->
+            <div class="p-6 flex items-center justify-center border-b max-h-16 border-gray-100 dark:border-gray-700">
+                <div class="flex flex-col items-center">
+                    <img src="assets/logo.png" alt="Logo" class="h-12 w-auto">
+                    <h1
+                        class="mt-3 text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                        Dashboard</h1>
+                </div>
             </div>
 
-            <div class="py-4">
-                <div class="px-4 mb-6">
-                    <div class="flex items-center space-x-3 mb-2">
-                        <!-- <div
-                            class="h-10 w-10 rounded-full bg-blue-500/10 dark:bg-blue-500/20 flex items-center justify-center">
-                            <mat-icon class="text-blue-500 dark:text-blue-400">person</mat-icon>
-                        </div> -->
-                        <div>
-                            <h3 class="font-medium text-gray-800 dark:text-gray-100">{{user$?.username | titlecase}}
-                            </h3>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">{{user$?.role[0]}}</p>
+            <!-- Contenu défilant -->
+            <div
+                class="overflow-y-auto flex-1 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
+                <div class="px-4 py-4">
+                    <div class="bg-blue-50 dark:bg-gray-700/50 rounded-xl p-3 mb-6">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white shadow-md">
+                                <span class="font-bold">{{user$?.username?.charAt(0) | uppercase}}</span>
+                            </div>
+                            <div>
+                                <h3 class="font-medium text-gray-800 dark:text-gray-100">{{user$?.username | titlecase}}
+                                </h3>
+                                <p class="text-xs font-medium text-blue-500 dark:text-blue-400">{{user$?.role[0]}}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <nav class="space-y-1">
+                        <a *ngFor="let nav of navigation" [routerLink]="nav.path"
+                            routerLinkActive="bg-blue-500 text-white shadow-md"
+                            class="flex items-center px-4 py-3 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-gray-700 transition-all duration-200">
+                            <mat-icon class="mr-3">{{nav.icon}}</mat-icon>
+                            <span class="text-sm font-medium">{{nav.title}}</span>
+                        </a>
+                    </nav>
+
+                    <!-- Éléments supplémentaires pour démontrer le défilement -->
+                    <div class="mt-6 p-4 bg-blue-50 dark:bg-gray-700/30 rounded-xl">
+                        <h4 class="font-medium text-sm text-gray-700 dark:text-gray-200 mb-3">Statistiques rapides</h4>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-gray-500 dark:text-gray-400">Projets actifs</span>
+                                <span class="text-xs font-medium text-blue-600 dark:text-blue-400">12</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-gray-500 dark:text-gray-400">Tâches en attente</span>
+                                <span class="text-xs font-medium text-amber-500">8</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-gray-500 dark:text-gray-400">Complétées aujourd'hui</span>
+                                <span class="text-xs font-medium text-green-500">5</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl">
+                        <h4 class="font-medium text-sm text-gray-700 dark:text-gray-200 mb-2">Équipe</h4>
+                        <div class="flex -space-x-2 mt-2">
+                            <div
+                                class="h-8 w-8 rounded-full bg-indigo-500 flex items-center justify-center text-white border-2 border-white dark:border-gray-800">
+                                M</div>
+                            <div
+                                class="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-white border-2 border-white dark:border-gray-800">
+                                J</div>
+                            <div
+                                class="h-8 w-8 rounded-full bg-purple-500 flex items-center justify-center text-white border-2 border-white dark:border-gray-800">
+                                A</div>
+                            <div
+                                class="h-8 w-8 rounded-full bg-green-500 flex items-center justify-center text-white border-2 border-white dark:border-gray-800">
+                                S</div>
+                            <div
+                                class="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300 border-2 border-white dark:border-gray-800">
+                                +3</div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <nav class="space-y-1">
-                    <a *ngFor="let nav of navigation" [routerLink]="nav.path"
-                        routerLinkActive="bg-blue-50/50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-300 border-l-4 border-blue-500"
-                        class="flex items-center px-4 py-2.5 mx-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                        <mat-icon class="mr-3 text-lg">{{nav.icon}}</mat-icon>
-                        <span class="text-sm font-medium">{{nav.title}}</span>
-                    </a>
-                </nav>
+            <!-- Footer fixe de la sidebar -->
+            <div class="p-4 border-t border-gray-100 dark:border-gray-700">
+                <button mat-button
+                    class="w-full h-10 flex items-center justify-center gap-2 text-gray-500 dark:text-gray-400 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
+                    <mat-icon class="text-sm">help_outline</mat-icon>
+                    <span>Centre d'aide</span>
+                </button>
             </div>
         </mat-sidenav>
 
         <!-- Main Content -->
-        <mat-sidenav-content class="bg-gray-50 dark:bg-gray-900">
-            <mat-toolbar
-                class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 h-16 shadow-sm">
-                <div class="flex items-center justify-between w-full">
-                    <div class="flex items-center gap-4">
-                        <button mat-icon-button (click)="sidenav.toggle()"
-                            class="text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors rounded-full">
-                            <mat-icon class="icon-outlined">menu</mat-icon>
-                        </button>
-                        <div class="flex items-center">
-                            <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100">
-                                {{ currentPage?.title || 'Dashboard' }}
-                            </h2>
-                            <span *ngIf="currentPage?.subtitle"
-                                class="ml-2 px-2 py-1 text-xs rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
-                                {{ currentPage?.subtitle }}
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center ml-6">
-                        <div *ngIf="user$ | async as user" class="mr-6 hidden md:block">
-                            <h3 class="font-medium text-gray-800 dark:text-gray-100">{{user$.username | titlecase}}</h3>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">{{user$.role[0]}}</p>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center space-x-3">
-                        <button mat-icon-button [matMenuTriggerFor]="notificationsMenu"
-                            class="text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors rounded-full"
-                            [matBadge]="unreadNotifications" [matBadgeHidden]="unreadNotifications === 0"
-                            matBadgeColor="accent">
-                            <mat-icon class="icon-outlined">notifications</mat-icon>
-                        </button>
-                        <button mat-icon-button (click)="toggleDarkMode()"
-                            class="text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors rounded-full">
-                            <mat-icon class="icon-outlined"
-                                [ngClass]="{'text-amber-500': isDarkMode, 'text-indigo-500': !isDarkMode}">
-                                {{ isDarkMode ? 'light_mode' : 'dark_mode' }}
-                            </mat-icon>
-                        </button>
-                        <button mat-icon-button [matMenuTriggerFor]="userMenu"
-                            class="text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors rounded-full">
-                            <div
-                                class="h-9 w-9 rounded-full bg-blue-500/10 dark:bg-blue-500/20 flex items-center justify-center overflow-hidden">
-                                <img *ngIf="(user$ | async)" [src]="(user$ | async)" alt="Avatar utilisateur"
-                                    class="h-full w-full object-cover">
-                                <mat-icon *ngIf="!(user$ | async)"
-                                    class="text-blue-500 dark:text-blue-400">person</mat-icon>
+        <mat-sidenav-content class="bg-transparent">
+            <!-- Toolbar -->
+            <div class="sticky top-0 z-10">
+                <mat-toolbar class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md h-16 px-4 shadow-sm">
+                    <div class="flex items-center justify-between w-full">
+                        <div class="flex items-center gap-4">
+                            <button mat-icon-button (click)="sidenav.toggle()"
+                                class="rounded-full w-10 h-10 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <mat-icon>menu</mat-icon>
+                            </button>
+                            <div class="flex items-center">
+                                <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100">{{ currentPage?.title
+                                    || 'Dashboard' }}</h2>
+                                <span *ngIf="currentPage?.subtitle"
+                                    class="ml-2 px-3 py-1 text-xs rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-300 font-medium">
+                                    {{ currentPage?.subtitle }}
+                                </span>
                             </div>
-                        </button>
-                    </div>
-                </div>
-            </mat-toolbar>
+                        </div>
 
-            <!-- Contenu -->
+                        <div class="flex items-center space-x-2">
+                            <button mat-icon-button [matMenuTriggerFor]="notificationsMenu"
+                                class="rounded-full w-10 h-10 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700"
+                                [matBadge]="unreadNotifications" [matBadgeHidden]="unreadNotifications === 0"
+                                matBadgeColor="accent">
+                                <mat-icon>notifications</mat-icon>
+                            </button>
+
+                            <button mat-icon-button (click)="toggleDarkMode()"
+                                class="rounded-full w-10 h-10 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <mat-icon [ngClass]="{'text-amber-500': isDarkMode, 'text-indigo-500': !isDarkMode}">
+                                    {{ isDarkMode ? 'light_mode' : 'dark_mode' }}
+                                </mat-icon>
+                            </button>
+
+                            <button mat-icon-button [matMenuTriggerFor]="userMenu"
+                                class="ml-2 rounded-full overflow-hidden h-10 w-10 bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white shadow">
+                                <img *ngIf="(user$ | async)" [src]="(user$ | async)" alt="Avatar"
+                                    class="h-full w-full object-cover">
+                                <mat-icon *ngIf="!(user$ | async)">person</mat-icon>
+                            </button>
+                        </div>
+                    </div>
+                </mat-toolbar>
+            </div>
+
+            <!-- Content -->
             <div class="p-6">
-                <router-outlet></router-outlet>
+                <div class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-md rounded-xl shadow-sm p-6">
+                    <router-outlet></router-outlet>
+                </div>
             </div>
 
             <!-- Menus -->
-            <mat-menu #notificationsMenu="matMenu" class="w-80 [&_.mat-menu-content]:p-0">
-                <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-                    <h3 class="text-sm font-semibold text-gray-800 dark:text-gray-100">Notifications</h3>
+            <mat-menu #notificationsMenu="matMenu" class="w-80">
+                <div class="p-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+                    <h3 class="font-medium text-gray-800 dark:text-gray-100">Notifications</h3>
+                    <span
+                        class="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 rounded-full">{{
+                        notifications.length }}</span>
                 </div>
-                <div class="divide-y divide-gray-200 dark:divide-gray-700">
+
+                <div class="max-h-80 overflow-y-auto">
                     <a *ngFor="let notif of notifications" href="#"
-                        class="block px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                        <div class="text-sm font-medium text-gray-800 dark:text-gray-100">{{notif.title}}</div>
-                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{notif.time}}</div>
+                        class="flex p-4 hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-0">
+                        <div
+                            class="mr-3 mt-1 h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center text-blue-500 dark:text-blue-300 flex-shrink-0">
+                            <mat-icon class="text-sm">{{notif.icon || 'notifications'}}</mat-icon>
+                        </div>
+                        <div>
+                            <div class="text-sm font-medium text-gray-800 dark:text-gray-100">{{notif.title}}</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{notif.time}}</div>
+                        </div>
                     </a>
                 </div>
-                <div class="p-2 border-t border-gray-200 dark:border-gray-700">
+
+                <div class="p-3">
                     <a href="#"
-                        class="block text-center text-sm text-blue-500 hover:bg-gray-50 dark:hover:bg-gray-800 py-2 rounded">
+                        class="block text-center text-sm text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 p-2 rounded-lg font-medium">
                         Voir toutes les notifications
                     </a>
                 </div>
             </mat-menu>
 
-            <mat-menu #userMenu="matMenu" class="min-w-[200px] [&_.mat-menu-content]:p-2">
-                <button mat-menu-item class="flex items-center h-10">
-                    <mat-icon class="icon-outlined mr-3">person</mat-icon>
+            <mat-menu #userMenu="matMenu" class="min-w-[240px]">
+                <div class="p-4 border-b border-gray-100 dark:border-gray-700 mb-2">
+                    <div class="font-medium text-gray-800 dark:text-gray-100">{{user$?.username | titlecase}}</div>
+                    <div class="text-xs text-blue-500 dark:text-blue-400">{{user$?.role[0]}}</div>
+                </div>
+
+                <button mat-menu-item class="h-12 mb-1 rounded-lg mx-2">
+                    <mat-icon class="mr-3 text-gray-500">person</mat-icon>
                     <span class="text-sm">Mon profil</span>
                 </button>
-                <button mat-menu-item class="flex items-center h-10">
-                    <mat-icon class="icon-outlined mr-3">settings</mat-icon>
+
+                <button mat-menu-item class="h-12 mb-1 rounded-lg mx-2">
+                    <mat-icon class="mr-3 text-gray-500">settings</mat-icon>
                     <span class="text-sm">Paramètres</span>
                 </button>
-                <div class="border-t border-gray-200 dark:border-gray-700 my-2"></div>
-                <button mat-menu-item class="flex items-center h-10 text-red-500" (click)="logOut()">
-                    <mat-icon class="icon-outlined mr-3">exit_to_app</mat-icon>
-                    <span class="text-sm">Déconnexion</span>
+
+                <div class="border-t border-gray-100 dark:border-gray-700 my-2"></div>
+
+                <button mat-menu-item class="h-12 rounded-lg mx-2 mb-2 text-red-500" (click)="logOut()">
+                    <mat-icon class="mr-3">exit_to_app</mat-icon>
+                    <span class="text-sm font-medium">Déconnexion</span>
                 </button>
             </mat-menu>
         </mat-sidenav-content>

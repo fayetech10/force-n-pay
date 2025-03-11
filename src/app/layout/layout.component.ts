@@ -46,9 +46,9 @@ export class LayoutComponent implements OnInit, OnDestroy {
   ];
 
   notifications = [
-    { title: 'Nouvelle mission ajoutée', time: 'Il y a 5 minutes' },
-    { title: 'Rapport soumis', time: 'Il y a 2 heures' },
-    { title: 'Paiement validé', time: 'Hier' }
+    { title: 'Nouvelle mission ajoutée', time: 'Il y a 5 minutes' ,icon: ""},
+    { title: 'Rapport soumis', time: 'Il y a 2 heures', icon: "" },
+    { title: 'Paiement validé', time: 'Hier', icon: "" }
   ];
   currentPageTitle: any;
   isDarkMode = false;
