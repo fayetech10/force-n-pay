@@ -7,12 +7,10 @@ import { MatListModule } from '@angular/material/list';
 import { User } from '../../interfaces/User';
 import { UserService } from '../../services/users.service';
 import { ActivatedRoute } from '@angular/router';
-import { catchError, map, Observable, of, Subject, takeUntil, tap } from 'rxjs';
+import { catchError, delay, EMPTY, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { CommonModule } from '@angular/common';
-import { MatProgressSpinner } from '@angular/material/progress-spinner';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
-import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatButtonModule } from '@angular/material/button';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
@@ -22,24 +20,33 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { UserFormDialogComponent } from '../../components/user-form-dialog/user-form-dialog.component';
 import { UserDetailsDialogComponent } from '../../components/user-details-dialog/user-details-dialog.component';
 import { ConfirmationDialogComponent } from '../../components/confirmation-dialog/confirmation-dialog.component';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatInputModule } from '@angular/material/input';
+import { JsonPatchOperation } from '../../interfaces/JsonPatchOperation';
+import { FormUserAddComponent } from '../../components/form-user-add/form-user-add.component';
+import { MatMenu, MatMenuTrigger } from '@angular/material/menu';
 
 @Component({
   selector: 'app-user-management',
   imports: [
     MatCardModule,
     MatListModule,
-    MatIconModule,
+
     MatChipsModule,
     MatDividerModule,
     CommonModule,
-    MatProgressSpinner,
-    MatFormFieldModule,
+    MatTableModule,
+    MatInputModule,
     MatSelectModule,
+    MatPaginatorModule,
+    MatIconModule,
+    MatButtonModule,
+    MatTooltipModule,
+    MatMenu,
+    MatMenuTrigger,
     ReactiveFormsModule,
     FormsModule,
-    MatTooltipModule,
-    MatButtonModule,
-    MatPaginatorModule
+
   ],
   templateUrl: './user-management.component.html',
   styleUrl: './user-management.component.scss'
@@ -47,6 +54,16 @@ import { ConfirmationDialogComponent } from '../../components/confirmation-dialo
 
 
 export class UserManagementComponent implements OnInit, OnDestroy {
+  sortBy: any;
+  userInitials(_t135: any) {
+    throw new Error('Method not implemented.');
+  }
+  filterStatus: any;
+  exportUsers() {
+    throw new Error('Method not implemented.');
+  }
+  showActiveOnly: any;
+
 
   isLoading = false;
   totalUsers = 0;
@@ -61,8 +78,14 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   allQualifications: string[] = [];
   contactItems!: ContactItem[];
   users$!: Observable<User[]>
-  private destroy$ = new Subject<void>();
+  displayedColumns: string[] = ['status', 'name', 'role', 'qualifications', 'rate', 'actions'];
 
+  private destroy$ = new Subject<void>();
+  dataSource!: MatTableDataSource<User>;
+  searchControl!: FormControl<any>;
+  activeUsersCount: any;
+  newUsersCount: any;
+  averageRate!: string | number;
   constructor(
     private route: ActivatedRoute,
     private userService: UserService,
@@ -71,65 +94,13 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   ) { }
   ngOnInit(): void {
     this.loadingUserByresolver()
-    this.loadRolesAndQualifications();
-    this.setupContactItems();
+
   }
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }
-  setupContactItems(): void {
-    this.contactItems = [
-      {
-        icon: 'phone',
-        type: 'link',
-        getContent: (user: User) => user.telephone || 'Non renseigné',
-        getAriaLabel: (user: User) => `Téléphone de ${user.prenom} ${user.nom}`,
-        getLink: (user: User) => `tel:${user.telephone}`
-      },
-      {
-        icon: 'home',
-        type: 'text',
-        getContent: (user: User) => user.adresse || 'Non renseigné',
-        getAriaLabel: (user: User) => `Adresse de ${user.prenom} ${user.nom}`
-      },
-      {
-        icon: 'cake',
-        type: 'text',
-        getContent: (user: User) => this.formatDate(user.dateNaissance),
-        getAriaLabel: (user: User) => `Date de naissance de ${user.prenom} ${user.nom}`
-      },
-      {
-        icon: 'account_balance',
-        type: 'text',
-        getContent: (user: User) => user.rib ? `RIB : ${user.rib}` : 'RIB non renseigné',
-        getAriaLabel: (user: User) => `RIB de ${user.prenom} ${user.nom}`
-      }
-    ];
-  }
 
-  getDefaultContactItems(): ContactItem[] {
-    return this.setupContactItems(), this.contactItems;
-  }
-
-  formatDate(date: string | Date): string {
-    if (!date) return 'Non renseigné';
-    try {
-      return new Date(date).toLocaleDateString('fr-FR');
-    } catch (error) {
-      return 'Date invalide';
-    }
-  }
-
-  loadRolesAndQualifications(): void {
-    // this.userService.getAllRoles()
-    //   .pipe(takeUntil(this.destroy$))
-    //   .subscribe(roles => this.allRoles = roles);
-
-    // this.userService.getAllQualifications()
-    //   .pipe(takeUntil(this.destroy$))
-    //   .subscribe(qualifications => this.allQualifications = qualifications);
-  }
 
   loadUsers(): void {
     this.isLoading = true;
@@ -177,64 +148,117 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     this.loadUsers();
   }
 
-  editUser(user: User): void {
-    const dialogRef = this.dialog.open(UserFormDialogComponent, {
-      width: '600px',
-      data: { user, mode: 'edit' }
+  addUser(): void {
+    const dialogRef = this.dialog.open(FormUserAddComponent, {
+      width: "1000px",
+      disableClose: true,
+      data: {} // Vous pouvez passer des données initiales ici si nécessaire
     });
 
     dialogRef.afterClosed()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(result => {
-        if (result) {
-          this.loadUsers();
-          this.showSnackBar(`L'utilisateur ${user.prenom} ${user.nom} a été modifié`, 'success');
+      .subscribe({
+        next: (createdUser: User | undefined) => {
+          if (createdUser) {
+            // 1. Ajout optimiste local
+            this.dataSource.data = [createdUser, ...this.dataSource.data];
+            dialogRef.close()
+            // 3. Notification utilisateur
+            this.snackBar.open('Utilisateur créé avec succès', 'Fermer', {
+              duration: 4000,
+              panelClass: 'success-snackbar'
+            });
+          }
+        },
+        error: (error) => {
+          console.error('Erreur lors de la création:', error);
+          this.snackBar.open('Échec de la création de l\'utilisateur', 'Fermer', {
+            duration: 4000,
+            panelClass: 'error-snackbar'
+          });
         }
       });
+  }
+  editUser(user: User): void {
+    const dialogRef = this.dialog.open(UserFormDialogComponent, {
+      width: '1000px',
+      disableClose: true,
+      data: {
+        user: { ...user },
+        mode: 'edit',
+      }
+
+    });
+
+    dialogRef.afterClosed()
+      .subscribe({
+        next: (createUser: User | undefined) => {
+          if (createUser) {
+            this.dataSource.data = [...this.dataSource.data, createUser]
+            this.snackBar.open('Utilisateur créé avec succès', 'Fermer', {
+              duration: 4000,
+              panelClass: 'success-snackbar'
+            });
+          }
+
+        },
+        error: (err) => {
+          console.error('Erreur lors de la création:', err);
+          this.snackBar.open('Échec de la création de l\'utilisateur', 'Fermer', {
+            duration: 4000,
+            panelClass: 'error-snackbar'
+          });
+
+        }
+      })
+
   }
 
   viewDetails(user: User): void {
     this.dialog.open(UserDetailsDialogComponent, {
-      width: '700px',
-      data: { user }
+      width: '1000px',
+      data: {
+        user,
+
+
+      },
+
     });
   }
 
   toggleUserStatus(user: User): void {
     const message = user.actif
-      ? `Êtes-vous sûr de vouloir désactiver l'utilisateur ${user.prenom} ${user.nom} ?`
-      : `Êtes-vous sûr de vouloir activer l'utilisateur ${user.prenom} ${user.nom} ?`;
+      ? `Désactiver l'utilisateur ${user.prenom} ${user.nom} ?`
+      : `Activer l'utilisateur ${user.prenom} ${user.nom} ?`;
 
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-      width: '400px',
       data: {
-        title: user.actif ? 'Désactiver l\'utilisateur' : 'Activer l\'utilisateur',
-        message,
-        confirmText: 'Confirmer',
-        cancelText: 'Annuler'
+        title: user.actif ? 'Désactivation' : 'Activation',
+        message
       }
     });
 
-    dialogRef.afterClosed()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(result => {
-        if (result) {
-          const updatedUser = { ...user, actif: !user.actif };
-          this.userService.updateUser(updatedUser)
-            .pipe(takeUntil(this.destroy$))
-            .subscribe(
-              () => {
-                this.loadUsers();
-                const action = updatedUser.actif ? 'activé' : 'désactivé';
-                this.showSnackBar(`L'utilisateur a été ${action}`, 'success');
-              },
-              error => {
-                console.error('Error updating user status:', error);
-                this.showSnackBar('Erreur lors de la mise à jour du statut', 'error');
-              }
-            );
-        }
-      });
+    dialogRef.afterClosed().pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(confirmed => {
+      if (confirmed) {
+        const operations: JsonPatchOperation[] = [{
+          op: "replace",
+          path: "/actif",
+          value: !user.actif
+        }];
+
+        this.userService.updateActif(user.id, operations).subscribe({
+          next: () => {
+            user.actif = !user.actif;
+            this.showSnackBar(`Statut ${user.actif ? 'activé' : 'désactivé'}`, 'success');
+          },
+          error: (err) => {
+            console.error('Erreur:', err);
+            this.showSnackBar('Échec de la mise à jour', 'error');
+          }
+        });
+      }
+    });
   }
 
   deleteUser(user: User): void {
@@ -250,25 +274,26 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     });
 
     dialogRef.afterClosed()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(result => {
-        if (result) {
-          this.userService.deleteUser(user.id)
-            .pipe(takeUntil(this.destroy$))
-            .subscribe(
-              () => {
-                this.loadUsers();
-                this.showSnackBar(`L'utilisateur ${user.prenom} ${user.nom} a été supprimé`, 'success');
-              },
-              error => {
-                console.error('Error deleting user:', error);
-                this.showSnackBar('Erreur lors de la suppression de l\'utilisateur', 'error');
-              }
-            );
+      .pipe(
+        takeUntil(this.destroy$),
+        switchMap(result => result
+          ? this.userService.deleteUser(user.id)
+          : EMPTY
+        )
+      )
+      .subscribe({
+        next: () => {
+          this.dataSource.data = this.dataSource.data.filter(u => u.id !== user.id);
+          this.dataSource.data = [...this.dataSource.data];
+
+          this.showSnackBar("Utilisateur a été supprimé avec succès", "success");
+        },
+        error: (err) => {
+          this.showSnackBar("Erreur lors de la suppression de l'utilisateur", "error");
+          console.error(err);
         }
       });
   }
-
   trackByUserId(index: number, user: User): number {
     return user.id;
   }
@@ -298,6 +323,16 @@ export class UserManagementComponent implements OnInit, OnDestroy {
         return of([]);
       })
 
+    this.users$.subscribe({
+      next: (users) => {
+        this.dataSource = new MatTableDataSource(users)
+        console.log(users);
+
+      },
+      error: (error) => {
+        console.log("Erreur lors du chargment des utilisateurs", error)
+      }
+    })
   }
 
 }

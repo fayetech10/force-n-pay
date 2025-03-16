@@ -27,7 +27,7 @@
                             <div>
                                 <h3 class="font-medium text-gray-800 dark:text-gray-100">{{user$?.username | titlecase}}
                                 </h3>
-                                <p class="text-xs font-medium text-blue-500 dark:text-blue-400">{{user$?.role[0]}}</p>
+                                <p class="text-xs font-medium text-blue-500 dark:text-blue-400">{{user$?.roles[0]}}</p>
                             </div>
                         </div>
                     </div>
@@ -181,7 +181,7 @@
             <mat-menu #userMenu="matMenu" class="min-w-[240px]">
                 <div class="p-4 border-b border-gray-100 dark:border-gray-700 mb-2">
                     <div class="font-medium text-gray-800 dark:text-gray-100">{{user$?.username | titlecase}}</div>
-                    <div class="text-xs text-blue-500 dark:text-blue-400">{{user$?.role[0]}}</div>
+                    <div class="text-xs text-blue-500 dark:text-blue-400">{{user$?.roles[0]}}</div>
                 </div>
 
                 <button mat-menu-item class="h-12 mb-1 rounded-lg mx-2">

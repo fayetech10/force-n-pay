@@ -1,5 +1,6 @@
 export interface User {
-    actif: any;
+nombreSeanceFaits: any;
+    actif: boolean;
     avatar: any;
     id: number;
     nom: string;
@@ -8,10 +9,11 @@ export interface User {
     email: string;
     password?: string | null;
     telephone: string;
-    adresse: string;
+    adress: string;
     dateNaissance: string | Date;
-    rib?: string | null;
+    iban?: string | null;
     qualifications: string[];
-    tauxRemuneration: number;
-    role: string[];
+    hourlyRate: number;
+    roles: string[];
+    lastActivity: Date
 }

@@ -1,0 +1,17 @@
+// Dans votre fichier de styles global
+.success-snackbar {
+  background-color: #4CAF50 !important;
+  color: white !important;
+}
+
+.error-snackbar {
+  background-color: #f44336 !important;
+  color: white !important;
+}
+
+.user-form-dialog {
+  .mat-dialog-container {
+    padding: 0;
+    overflow: visible;
+  }
+}
