@@ -74,5 +74,8 @@ export class UserService {
         )
     }
 
+    getOneUserById(id: number):Observable<User>{
+            return this.http.get<User>(`${this.baseUrl}`)
+    }
 
 }

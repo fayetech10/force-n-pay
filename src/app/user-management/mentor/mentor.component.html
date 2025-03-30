@@ -1,0 +1,205 @@
+<div *ngIf="!isLoading" class="container mx-auto px-4 sm:px-6 lg:px-8 py-10 bg-gray-50 min-h-screen">
+    <!-- En-tête avec actions -->
+    <div class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div class="space-y-2">
+            <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Gestion des Utilisateurs</h1>
+            <div class="flex items-center gap-2 text-sm text-gray-500">
+                <mat-icon class="text-gray-400 text-lg">group</mat-icon>
+                <span>{{ mentors.length }} mentors enregistrés</span>
+            </div>
+        </div>
+        <button mat-raised-button color="primary"
+            class="h-12 px-6 flex items-center gap-2 shadow-lg hover:shadow-xl transition-shadow" (click)="addMentor()">
+            <mat-icon class="text-white">person_add_alt_1</mat-icon>
+            <span class="font-medium">Nouvel utilisateur</span>
+        </button>
+    </div>
+
+    <!-- Statistiques résumé -->
+    <div class="mb-8 grid grid-cols-1 md:grid-cols-4 gap-4">
+        <!-- Carte Total Users -->
+        <div
+            class="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-blue-100">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-blue-600 mb-1 font-medium">Total utilisateurs</p>
+                    <p class="text-3xl font-bold text-blue-900">{{ mentors.length }}</p>
+                </div>
+                <div class="bg-blue-600/10 p-3 rounded-xl">
+                    <mat-icon class="text-blue-600 text-2xl">people_outline</mat-icon>
+                </div>
+            </div>
+        </div>
+
+        <!-- Carte Active Users -->
+        <div
+            class="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-green-100">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-green-600 mb-1 font-medium">Utilisateurs actifs</p>
+                    <p class="text-3xl font-bold text-green-900">{{ 23 }}</p>
+                </div>
+                <div class="bg-green-600/10 p-3 rounded-xl">
+                    <mat-icon class="text-green-600 text-2xl">check_circle</mat-icon>
+                </div>
+            </div>
+        </div>
+
+        <!-- Carte Nouveaux -->
+        <div
+            class="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-purple-100">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-purple-600 mb-1 font-medium">Nouveaux (7j)</p>
+                    <p class="text-3xl font-bold text-purple-900">{{ 23 }}</p>
+                </div>
+                <div class="bg-purple-600/10 p-3 rounded-xl">
+                    <mat-icon class="text-purple-600 text-2xl">trending_up</mat-icon>
+                </div>
+            </div>
+        </div>
+
+        <!-- Carte Taux moyen -->
+        <div
+            class="bg-gradient-to-br from-amber-50 to-amber-100 p-6 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-amber-100">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-amber-600 mb-1 font-medium">Taux moyen</p>
+                    <p class="text-3xl font-bold text-amber-900">{{ 44 | number:'1.1-1' }}€/h</p>
+                </div>
+                <div class="bg-amber-600/10 p-3 rounded-xl">
+                    <mat-icon class="text-amber-600 text-2xl">euro_symbol</mat-icon>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tableau responsive -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <table mat-table [dataSource]="dataSource" class="w-full">
+            <!-- Colonne Statut -->
+            <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef class="pl-6 pr-2 py-4"></th>
+                <td mat-cell *matCellDef="let user" class="pl-6 pr-2 py-4">
+                    <div class="w-8 h-8 flex items-center justify-center">
+                        <mat-icon [ngClass]="{
+                            'text-green-600': user.actif, 
+                            'text-red-500': !user.actif
+                        }" class="!text-2xl">
+                            {{ user.actif ? 'toggle_on' : 'toggle_off' }}
+                        </mat-icon>
+                    </div>
+                </td>
+            </ng-container>
+
+            <!-- Colonne Nom -->
+            <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef class="px-4 py-4 text-left font-medium text-gray-700">Utilisateur
+                </th>
+                <td mat-cell *matCellDef="let user" class="px-4 py-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <mat-icon class="text-blue-600">person</mat-icon>
+                        </div>
+                        <div>
+                            <div class="font-medium text-gray-900">{{ user.prenom | titlecase }} {{ user.nom | titlecase
+                                }}</div>
+                            <div class="text-sm text-gray-500 mt-1">{{ user.email }}</div>
+                        </div>
+                    </div>
+                </td>
+            </ng-container>
+
+            <!-- Colonne Rôle -->
+            <ng-container matColumnDef="role">
+                <th mat-header-cell *matHeaderCellDef class="px-4 py-4 text-left font-medium text-gray-700">Rôle</th>
+                <td mat-cell *matCellDef="let user" class="px-4 py-4">
+                    <span
+                        class="inline-block px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium shadow-sm">
+                        {{ user.roles }}
+                    </span>
+                </td>
+            </ng-container>
+
+            <!-- Colonne Qualifications -->
+            <ng-container matColumnDef="qualifications">
+                <th mat-header-cell *matHeaderCellDef class="px-4 py-4 text-left font-medium text-gray-700">
+                    Qualifications</th>
+                <td mat-cell *matCellDef="let user" class="px-4 py-4">
+                    <div class="flex flex-wrap gap-2">
+                        <span *ngFor="let qual of user.qualifications"
+                            class="px-2.5 py-1 bg-gray-100 rounded-md text-sm text-gray-700 shadow-sm">
+                            {{ qual }}
+                        </span>
+                    </div>
+                </td>
+            </ng-container>
+
+            <!-- Colonne Taux -->
+            <ng-container matColumnDef="rate">
+                <th mat-header-cell *matHeaderCellDef class="px-4 py-4 text-right font-medium text-gray-700">Taux
+                    horaire</th>
+                <td mat-cell *matCellDef="let user" class="px-4 py-4 text-right">
+                    <span class="text-base font-semibold text-green-700">
+                        {{ user.hourlyRate | number:'1.1-1' }}€
+                    </span>
+                </td>
+            </ng-container>
+
+            <!-- Colonne Actions -->
+            <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef class="pr-6 py-4 text-right"></th>
+                <td mat-cell *matCellDef="let user" class="pr-6 py-4">
+                    <div class="flex justify-end gap-2">
+                        <button mat-icon-button class="hover:bg-gray-100 rounded-lg" matTooltip="Voir détails"
+                            (click)="viewDetails(user)">
+                            <mat-icon color="accent">visibility</mat-icon>
+                        </button>
+                        <button mat-icon-button class="hover:bg-gray-100 rounded-lg" matTooltip="Modifier"
+                            (click)="editUser(user)">
+                            <mat-icon color="primary">edit</mat-icon>
+                        </button>
+                        <button mat-icon-button class="hover:bg-gray-100 rounded-lg" matTooltip="Supprimer"
+                            (click)="deleteUser(user)">
+                            <mat-icon color="warn">delete</mat-icon>
+                        </button>
+                        <button mat-icon-button class="hover:bg-gray-100 rounded-lg" matTooltip="Changer statut"
+                            (click)="toggleUserStatus(user)">
+                            <mat-icon [color]="user.actif ? 'warn' : 'primary'">
+                                {{ user.actif ? 'toggle_off' : 'toggle_on' }}
+                            </mat-icon>
+                        </button>
+                    </div>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns" class="bg-gray-50 border-b border-gray-200"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+                class="hover:bg-gray-50/50 transition-colors border-b border-gray-100"></tr>
+
+            <!-- État vide -->
+            <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell py-16 text-center" colspan="6">
+                    <div class="max-w-md mx-auto space-y-4">
+                        <div class="text-blue-100/70 mx-auto">
+                            <mat-icon class="text-6xl">manage_search</mat-icon>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900">Aucun utilisateur trouvé</h3>
+                        <p class="text-gray-500">
+                            Essayez d'ajuster vos filtres ou créez un nouvel utilisateur.
+                        </p>
+                        <button mat-stroked-button color="primary" class="mt-4" (click)="addMentor()">
+                            <mat-icon>add</mat-icon>
+                            Ajouter un utilisateur
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <mat-paginator [length]="totalUsers" [pageSize]="pageSize" [pageSizeOptions]="[10, 25, 50]"
+        (page)="onPageChange($event)" class="mt-6 bg-white rounded-lg shadow-sm border border-gray-200">
+    </mat-paginator>
+</div>

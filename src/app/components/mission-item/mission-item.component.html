@@ -1,0 +1,42 @@
+<div class="mission-card" [class.expanded]="expanded">
+    <div class="mission-header" (click)="toggleExpand()">
+        <div class="client-logo">
+            <img [src]="mission.client.logo" [alt]="mission.client.name">
+        </div>
+        <div class="mission-info">
+            <h3>{{ mission.title }}</h3>
+            <div class="meta-info">
+                <span class="status-badge">{{ mission.status }}</span>
+                <span class="timeline">{{ mission.startDate }} - {{ mission.endDate }}</span>
+            </div>
+        </div>
+        <div class="mission-actions">
+            <button mat-icon-button (click)="toggleStar($event)">
+                <mat-icon>{{ mission.starred ? 'star' : 'star_outline' }}</mat-icon>
+            </button>
+            <button mat-icon-button [matMenuTriggerFor]="menu">
+                <mat-icon>more_vert</mat-icon>
+            </button>
+        </div>
+    </div>
+
+    <div class="mission-details" *ngIf="expanded">
+        <div class="detail-section">
+            <h4>Détails de la mission</h4>
+            <p>{{ mission.description }}</p>
+        </div>
+
+        <div class="progress-section">
+            <app-progress-bar [value]="mission.progress"></app-progress-bar>
+            <div class="progress-stats">
+                <span>{{ mission.progress }}% complété</span>
+                <span>{{ mission.remainingDays }} jours restants</span>
+            </div>
+        </div>
+
+        <div class="documents-section">
+            <app-file-upload [missionId]="mission.id"></app-file-upload>
+            <app-document-list [documents]="mission.documents"></app-document-list>
+        </div>
+    </div>
+</div>

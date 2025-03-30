@@ -1,1 +1,256 @@
-<p>ddd</p>
+<div class="container mx-auto p-4">
+    <!-- En-tête premium -->
+    <div class="bg-white rounded-2xl shadow-xl overflow-hidden mb-6 border border-gray-200/60">
+        <div class="relative bg-gradient-to-br from-blue-800 to-indigo-900 text-white px-8 py-6">
+            <div
+                class="absolute inset-0 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTAgMEgxNlYxNkgweiIgZmlsbD0ibm9uZSIvPjxwYXRoIGQ9Ik04IDBhOCA4IDAgMTAwIDE2AThjMC0uMzA0IDAtLjYwNC0uMDI0LS45SDkuNDE2YTcgNyAwIDExNi4zMjQtNi4wMDhBNyA3IDAgMDE5LjM3MiAwaC0xLjM0OEEyOC4zOCAyOC4zOCAwIDAwOCAwIiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9Ii4xNSIvPjwvc3ZnPg==')]">
+            </div>
+            <div class="relative flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <mat-icon class="!text-blue-200 text-3xl">account_balance</mat-icon>
+                    <h1 class="text-2xl font-bold tracking-tight">Transaction #{{ paymentData.numero }}</h1>
+                </div>
+                <div class="px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full shadow-inner border border-white/20">
+                    <span class="text-sm font-medium flex items-center gap-2">
+                        <span class="inline-block w-2 h-2 rounded-full animate-pulse"
+                            [ngClass]="paymentData.statut === 'paye' ? 'bg-emerald-400' : 'bg-amber-400'"></span>
+                        {{ paymentData.statut === 'paye' ? 'Paiement validé' : 'En attente de confirmation' }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenu principal -->
+        <div class="p-8 space-y-8">
+            <!-- Cartes principales -->
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                <!-- Carte Paiement -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200/60">
+                    <div class="flex items-center gap-3 mb-5 pb-3 border-b border-gray-100">
+                        <mat-icon class="text-blue-600 bg-blue-100 p-2 rounded-lg">receipt</mat-icon>
+                        <h2 class="text-lg font-semibold text-gray-800">Détails financiers</h2>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div class="space-y-0.5">
+                            <div class="text-gray-500 flex items-center gap-2">
+                                <mat-icon class="!text-gray-400 !text-sm">paid</mat-icon>
+                                Montant total
+                            </div>
+                            <div class="font-semibold text-2xl text-blue-700">
+                                {{ formatCurrency(paymentData.montant) }}
+                            </div>
+                        </div>
+
+                        <div class="space-y-0.5">
+                            <div class="text-gray-500 flex items-center gap-2">
+                                <mat-icon class="!text-gray-400 !text-sm">calendar_today</mat-icon>
+                                Date d'échéance
+                            </div>
+                            <div class="font-medium text-gray-800">
+                                {{ formatDate(paymentData.datePaiement) }}
+                            </div>
+                        </div>
+
+                        <div class="space-y-0.5">
+                            <div class="text-gray-500 flex items-center gap-2">
+                                <mat-icon class="!text-gray-400 !text-sm">credit_card</mat-icon>
+                                Méthode
+                            </div>
+                            <div class="font-medium text-gray-800 capitalize">
+                                {{ paymentData.methode || 'Virement bancaire' }}
+                            </div>
+                        </div>
+
+                        <div class="space-y-0.5">
+                            <div class="text-gray-500 flex items-center gap-2">
+                                <mat-icon class="!text-gray-400 !text-sm">fingerprint</mat-icon>
+                                Référence
+                            </div>
+                            <div class="font-medium text-gray-800 font-mono">
+                                {{ paymentData.reference || 'N/A' }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Carte Mission -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200/60">
+                    <div class="flex items-center gap-3 mb-5 pb-3 border-b border-gray-100">
+                        <mat-icon class="text-indigo-600 bg-indigo-100 p-2 rounded-lg">assignment_turned_in</mat-icon>
+                        <h2 class="text-lg font-semibold text-gray-800">Engagement mission</h2>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div class="space-y-0.5">
+                            <div class="text-gray-500 flex items-center gap-2">
+                                <mat-icon class="!text-gray-400 !text-sm">business_center</mat-icon>
+                                Type mission
+                            </div>
+                            <div class="font-medium text-gray-800">
+                                {{ paymentData.mission.type }}
+                            </div>
+                        </div>
+
+                        <div class="space-y-0.5">
+                            <div class="text-gray-500 flex items-center gap-2">
+                                <mat-icon class="!text-gray-400 !text-sm">savings</mat-icon>
+                                Budget alloué
+                            </div>
+                            <div class="font-semibold text-indigo-700">
+                                {{ formatCurrency(paymentData.mission.budget) }}
+                            </div>
+                        </div>
+
+                        <div class="space-y-0.5">
+                            <div class="text-gray-500 flex items-center gap-2">
+                                <mat-icon class="!text-gray-400 !text-sm">track_changes</mat-icon>
+                                Objectif
+                            </div>
+                            <div class="font-medium text-gray-800">
+                                {{ paymentData.mission.objectif || 'Non spécifié' }}
+                            </div>
+                        </div>
+
+                        <div class="space-y-0.5">
+                            <div class="text-gray-500 flex items-center gap-2">
+                                <mat-icon class="!text-gray-400 !text-sm">flag</mat-icon>
+                                Avancement
+                            </div>
+                            <div class="font-medium text-gray-800">
+                                {{ getMissionStatus() }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section Bénéficiaire -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200/60">
+                <div class="p-4 bg-gray-50 border-b flex items-center gap-3">
+                    <mat-icon class="text-gray-600">person_pin_circle</mat-icon>
+                    <h3 class="font-semibold text-gray-800">Destinataire du paiement</h3>
+                </div>
+                <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+                    <!-- Colonne Gauche -->
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-4">
+                            <div class="relative">
+                                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-600 to-blue-600 
+                                          flex items-center justify-center text-white font-semibold shadow-lg">
+                                    {{ paymentData.mission.utilisateur.prenom?.charAt(0) || 'U' }}
+                                    {{ paymentData.mission.utilisateur.nom?.charAt(0) || 'X' }}
+                                </div>
+                                <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-green-400 rounded-full 
+                                          border-2 border-white shadow-sm"></div>
+                            </div>
+                            <div>
+                                <div class="font-semibold text-gray-800 text-base">
+                                    {{ paymentData.mission.utilisateur.prenom }}
+                                    {{ paymentData.mission.utilisateur.nom }}
+                                </div>
+                                <div class="text-gray-500 text-sm">
+                                    {{ paymentData.mission.utilisateur.username }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <div class="flex items-center gap-2 text-gray-500">
+                                <mat-icon class="!text-base">alternate_email</mat-icon>
+                                <span>Contact</span>
+                            </div>
+                            <div class="flex flex-col gap-1.5">
+                                <a href="mailto:{{ paymentData.mission.utilisateur.email }}"
+                                    class="text-blue-600 hover:underline flex items-center gap-2">
+                                    <mat-icon class="!text-blue-400">mail</mat-icon>
+                                    {{ paymentData.mission.utilisateur.email }}
+                                </a>
+                                <a *ngIf="paymentData.mission.utilisateur.telephone"
+                                    href="tel:{{ paymentData.mission.utilisateur.telephone }}"
+                                    class="text-blue-600 hover:underline flex items-center gap-2">
+                                    <mat-icon class="!text-blue-400">phone</mat-icon>
+                                    {{ paymentData.mission.utilisateur.telephone }}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Colonne Droite -->
+                    <div class="space-y-4">
+                        <div class="space-y-2">
+                            <div class="flex items-center gap-2 text-gray-500">
+                                <mat-icon class="!text-base">account_balance</mat-icon>
+                                <span>Coordonnées bancaires</span>
+                            </div>
+                            <div class="font-mono text-gray-700 bg-gray-50 p-3 rounded-lg border border-gray-200 
+                                      flex items-center justify-between">
+                                {{ paymentData.mission.utilisateur.iban }}
+                                <button mat-icon-button class="text-gray-400 hover:text-blue-600"
+                                    (click)="copyToClipboard(paymentData.mission.utilisateur.iban)">
+                                    <mat-icon>content_copy</mat-icon>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <div class="flex items-center gap-2 text-gray-500">
+                                <mat-icon class="!text-base">work_history</mat-icon>
+                                <span>Tarification</span>
+                            </div>
+                            <div class="font-semibold text-blue-700 text-xl">
+                                {{ formatCurrency(paymentData.mission.utilisateur.hourlyRate) }} / h
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section Expertise -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200/60">
+                <div class="p-4 bg-gray-50 border-b flex items-center gap-3">
+                    <mat-icon class="text-gray-600">verified_user</mat-icon>
+                    <h3 class="font-semibold text-gray-800">Expertise associée</h3>
+                </div>
+                <div class="p-6 space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <h4 class="text-sm font-medium text-gray-600">Compétences certifiées</h4>
+                            <div class="flex flex-wrap gap-2">
+                                <span *ngFor="let qualif of paymentData.mission.utilisateur.qualifications" class="px-3 py-1.5 bg-green-50 text-green-800 rounded-full text-sm 
+                                             border border-green-200 flex items-center gap-2">
+                                    <mat-icon class="!text-green-600 !text-sm">verified</mat-icon>
+                                    {{ qualif }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <h4 class="text-sm font-medium text-gray-600">Rôles attribués</h4>
+                            <div class="flex flex-wrap gap-2">
+                                <span *ngFor="let role of paymentData.mission.utilisateur.roles" class="px-3 py-1.5 bg-indigo-50 text-indigo-800 rounded-full text-sm 
+                                             border border-indigo-200 flex items-center gap-2">
+                                    <mat-icon class="!text-indigo-600 !text-sm">badge</mat-icon>
+                                    {{ role }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="px-8 py-4 bg-gray-50 border-t flex justify-end gap-3">
+            <button mat-stroked-button class="!rounded-lg !border-gray-300 !text-gray-700 hover:!bg-gray-100 !px-5 !py-2
+                           transition-all duration-200">
+                <mat-icon class="!scale-90 mr-1">delete</mat-icon>
+                Annuler paiement
+            </button>
+            <button mat-flat-button class="!rounded-lg !bg-gradient-to-r !from-blue-700 !to-indigo-800 !text-white
+                           hover:!from-blue-800 hover:!to-indigo-900 shadow-sm hover:shadow-md !px-6 !py-2
+                           transition-all duration-200">
+                <mat-icon class="mr-1">edit_document</mat-icon>
+                Éditer transaction
+            </button>
+        </div>
+    </div>
+</div>

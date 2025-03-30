@@ -5,9 +5,15 @@ module.exports = {
   theme: {
     extend: {
       boxShadow: {
-        'soft': '0 8px 32px rgba(0,0,0,0.05)',
+                'hard-xl': '0 20px 25px -5px rgba(0, 0, 0, 0.15)',
       }
-    }
+    },
+    borderOpacity: {
+        50: '0.5'
+      },
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+      }
   }
 }
 

@@ -21,6 +21,17 @@ export class AuthServiceConfig {
             'Authorization': `Bearer ${token}`
         });
     }
+    createFilehHeader(): HttpHeaders {
+        const token = this.getToken();
+        if (!token) {
+            this.handleMissingToken();
+            throw new Error('Token non disponible');
+        }
+
+        return new HttpHeaders({
+            'Authorization': `Bearer ${token}`
+        });
+    }
 
     getToken(): string | null {
         return sessionStorage.getItem("token");
@@ -37,7 +48,7 @@ export class AuthServiceConfig {
 
         if (error.status === 403) {
             errorMessage = 'Accès refusé - Veuillez vous reconnecter';
-            this.handleMissingToken();
+            // this.handleMissingToken();
         } else if (error.error instanceof ErrorEvent) {
             console.error('Erreur client:', error.error.message);
         } else {

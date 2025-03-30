@@ -1,0 +1,185 @@
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- En-tête amélioré -->
+    <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800 dark:text-white tracking-tight leading-tight">
+                Mes Missions
+            </h1>
+            <p class="text-gray-500 dark:text-gray-400 mt-2 max-w-2xl">
+                Gérez vos missions en cours et consultez les rapports associés
+            </p>
+        </div>
+
+        <div class="flex items-center gap-3 w-full sm:w-auto">
+            <button mat-icon-button aria-label="Notifications"
+                class="relative hover:bg-gray-100 dark:hover:bg-gray-700 p-2 rounded-full transition-colors"
+                matTooltip="Notifications">
+                <mat-icon class="text-gray-600 dark:text-gray-300">notifications</mat-icon>
+                @if (unreadNotifications) {
+                <span
+                    class="absolute top-0 right-0 h-3 w-3 bg-red-500 rounded-full ring-2 ring-white dark:ring-gray-800"></span>
+                }
+            </button>
+
+            <button mat-flat-button color="primary" routerLink="/reports/new"
+                class="group flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 px-5 py-2.5 rounded-xl shadow-lg transition-transform">
+                <mat-icon class="transform transition-transform group-hover:rotate-90">add</mat-icon>
+                <span class="font-semibold">Nouveau Rapport</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Liste des missions optimisée -->
+    <section class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 mb-10">
+        <div
+            class="p-6 border-b border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+                <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Missions Actives</h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">{{ 76 }} missions en cours</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <button mat-stroked-button (click)="openFilterDialog()"
+                    class="min-w-[120px] flex items-center justify-center gap-2">
+                    <mat-icon>filter_list</mat-icon>
+                    <span class="hidden sm:inline">Filtrer</span>
+                </button>
+                <button mat-stroked-button [matMenuTriggerFor]="sortMenu"
+                    class="min-w-[120px] flex items-center justify-center gap-2">
+                    <mat-icon>sort</mat-icon>
+                    <span class="hidden sm:inline">Trier</span>
+                </button>
+            </div>
+        </div>
+
+        <cdk-virtual-scroll-viewport itemSize="100" class="h-[600px]">
+            @for (mission of (missions$ | async); track mission.id; let i = $index) {
+            <div
+                class="p-6 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                <div class="flex flex-col sm:flex-row justify-between items-start gap-4">
+                    <div class="flex items-start gap-4 flex-1">
+                        <div
+                            class="h-12 w-12 rounded-xl bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-medium shadow-sm">
+                            {{mission.name.charAt(0).toUpperCase() }}
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-medium text-gray-800 dark:text-white">{{ mission.name }}</h3>
+                            <div class="flex flex-wrap items-center gap-3 mt-2">
+                                <span class="px-2.5 py-1 text-xs rounded-full font-medium" [ngClass]="{
+                                        'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400': mission.status_mission === 'En cours',
+                                        'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400': mission.status_mission === 'Terminé'
+                                      }">
+                                    {{ mission.status_mission | titlecase }}
+                                </span>
+                                <div class="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                                    <mat-icon class="text-sm mr-1.5 opacity-70">calendar_today</mat-icon>
+                                    {{ mission.dateDebut| date:'dd/MM/yyyy' }}
+                                </div>
+                                <div class="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                                    <mat-icon class="text-sm mr-1.5 opacity-70">attach_money</mat-icon>
+                                    {{ mission.budget| currency:'EUR':'symbol':'1.0-0' }}/jour
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 w-full sm:w-auto">
+                        <button mat-stroked-button (click)="openReportDialog(mission)"
+                            class="w-full sm:w-auto flex items-center gap-2">
+                            <mat-icon>description</mat-icon>
+                            <span>Rapport</span>
+                        </button>
+                        <button mat-stroked-button (click)="openDetailMission(mission)"
+                            class="w-full sm:w-auto flex items-center gap-2">
+                            <mat-icon>description</mat-icon>
+                            <span>voir detail</span>
+                        </button>
+                        <button mat-icon-button [matMenuTriggerFor]="missionMenu"
+                            class="text-gray-500 dark:text-gray-400">
+                            <mat-icon>more_vert</mat-icon>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mt-4 flex items-center gap-4">
+                    <div class="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                        <div class="h-full bg-gradient-to-r from-indigo-500 to-purple-600 transition-all duration-500"
+                            [style.width.%]="mission.progress"></div>
+                    </div>
+                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        {{ mission.progress }}% complété
+                    </span>
+                </div>
+            </div>
+            }
+        </cdk-virtual-scroll-viewport>
+
+        <div class="p-6 border-t border-gray-200 dark:border-gray-700 flex justify-center">
+            <mat-paginator [length]="totalMissions" [pageSize]="pageSize" [pageIndex]="currentPage"
+                (page)="onPageChange($event)" class="rounded-xl" aria-label="Pagination des missions">
+            </mat-paginator>
+        </div>
+    </section>
+
+    <!-- Section paiements améliorée -->
+    <section class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+        <div
+            class="p-6 border-b border-gray-200 dark:border-gray-700 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>
+                <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Historique des Paiements</h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Dernières transactions des 30 derniers jours
+                </p>
+            </div>
+            <button mat-stroked-button routerLink="/payments/history"
+                class="min-w-[200px] flex items-center justify-center gap-2">
+                Voir l'historique complet
+                <mat-icon>chevron_right</mat-icon>
+            </button>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full" aria-label="Historique des paiements">
+                <thead class="bg-gray-50 dark:bg-gray-750 sticky top-0">
+                    <tr>
+                        <th class="px-6 py-4 text-left text-sm font-medium">Mission</th>
+                        <th class="px-6 py-4 text-left text-sm font-medium">Date</th>
+                        <th class="px-6 py-4 text-left text-sm font-medium">Montant</th>
+                        <th class="px-6 py-4 text-left text-sm font-medium">Statut</th>
+                        <th class="px-6 py-4 text-right text-sm font-medium">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (payment of payments; track payment.amount) {
+                    <tr class="border-t border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-750">
+                        <td class="px-6 py-4 font-medium">{{ payment.amount }}</td>
+                        <td class="px-6 py-4">{{ payment.date | date:'dd/MM/yy' }}</td>
+                        <td class="px-6 py-4 font-medium">{{ payment.amount | currency:'EUR':'symbol':'1.0-0' }}</td>
+                        <td class="px-6 py-4">
+                            <span class="px-3 py-1 text-xs rounded-full font-medium" [ngClass]="{
+                                    'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400': payment.status === 'payé',
+                                    'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400': payment.status === 'disputed',
+                                    'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400': payment.status === 'en attente'
+                                  }">
+                                {{ payment.status | titlecase }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <div class="flex items-center justify-end gap-2">
+                                <button mat-icon-button (click)="downloadInvoice(payment)"
+                                    matTooltip="Télécharger la facture">
+                                    <mat-icon>download</mat-icon>
+                                </button>
+                                @if (payment.status !== 'disputed') {
+                                <button mat-icon-button color="warn" (click)="openDisputeDialog(payment)"
+                                    matTooltip="Contester le paiement">
+                                    <mat-icon>warning</mat-icon>
+                                </button>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>

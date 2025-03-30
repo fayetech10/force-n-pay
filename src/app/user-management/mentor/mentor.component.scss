@@ -1,0 +1,15 @@
+.mat-mdc-paginator-range-actions {
+    @apply gap-4;
+}
+
+.mat-mdc-icon-button {
+    @apply transition-colors duration-200;
+}
+
+.mat-mdc-table {
+    @apply font-sans;
+}
+
+.mat-mdc-paginator {
+    @apply bg-transparent border-t-0;
+}

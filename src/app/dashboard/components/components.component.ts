@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -16,6 +16,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { BaseChartDirective } from 'ng2-charts';
 import { Chart, ChartData, ChartOptions, registerables } from 'chart.js';
 import { MatTableModule } from '@angular/material/table';
+import { User } from '../../interfaces/User';
+import { AuthService } from '../../services/auth.service';
 @Component({
   selector: 'app-components',
   standalone: true,
@@ -46,7 +48,7 @@ export class ComponentsComponent implements OnInit {
   missionChartData = [25, 12, 5]; // En cours, Terminées, En attente
   missionChartLabels = ['En cours', 'Terminées', 'En attente'];
   missionChartColors = ['#3B82F6', '#10B981', '#9CA3AF'];
-  
+  user!: User
 
   displayedColumns: string[] = ['name', 'status', 'user', 'date', 'actions'];
   recentMissions = [
@@ -56,10 +58,14 @@ export class ComponentsComponent implements OnInit {
     { id: 'M-039', name: 'Test d\'intégration', status: 'En cours', user: 'Sophie Martin', date: '8 mars 2025' }
   ];
   dataSource = this.recentMissions
-
-constructor(private readonly route: ActivatedRoute){
-  Chart.register(...registerables)
-} 
+  isLoading: boolean = false
+  constructor(
+    private route: ActivatedRoute,
+    private authService: AuthService,
+    private router: Router
+  ) {
+    Chart.register(...registerables)
+  }
 
   // Graphique des utilisateurs
   public userChartData: ChartData<'line'> = {
@@ -84,7 +90,7 @@ constructor(private readonly route: ActivatedRoute){
     ]
   };
 
-  
+
   // Options des graphiques
   public chartOptions: ChartOptions = {
     responsive: true,
@@ -110,6 +116,10 @@ constructor(private readonly route: ActivatedRoute){
   ngAfterViewInit(): void {
     this.createMissionChart();
     this.createUserChart();
+
+
+
+
   }
   createMissionChart(): void {
     new Chart('missionChart', {
@@ -185,7 +195,9 @@ constructor(private readonly route: ActivatedRoute){
   ngOnInit(): void {
     this.checkDarkMode();
     this.setupChartTheme();
+
   }
+ 
 
   checkDarkMode(): void {
     const darkModeEnabled = localStorage.getItem('darkMode') === 'true';

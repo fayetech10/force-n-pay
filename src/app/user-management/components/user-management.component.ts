@@ -25,6 +25,7 @@ import { MatInputModule } from '@angular/material/input';
 import { JsonPatchOperation } from '../../interfaces/JsonPatchOperation';
 import { FormUserAddComponent } from '../../components/form-user-add/form-user-add.component';
 import { MatMenu, MatMenuTrigger } from '@angular/material/menu';
+import { UserDataService } from '../../services/components/UsersDataService.service';
 
 @Component({
   selector: 'app-user-management',
@@ -42,8 +43,6 @@ import { MatMenu, MatMenuTrigger } from '@angular/material/menu';
     MatIconModule,
     MatButtonModule,
     MatTooltipModule,
-    MatMenu,
-    MatMenuTrigger,
     ReactiveFormsModule,
     FormsModule,
 
@@ -90,11 +89,19 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private userService: UserService,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private usersDataService: UserDataService
   ) { }
-  ngOnInit(): void {
-    this.loadingUserByresolver()
 
+  users!: Observable<User[]>
+  ngOnInit(): void {
+    // this.loadingUserByresolver()
+    this.loadUsersFromApi()
+
+  }
+  loadUsersFromApi(): void {
+    this.users = this.usersDataService.users$
+    this.usersDataService.loadUsers().subscribe(users => console.log(users))
   }
   ngOnDestroy(): void {
     this.destroy$.next();

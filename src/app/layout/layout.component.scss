@@ -13,3 +13,19 @@
   background-color: #3b82f6 !important;
   color: white !important;
 }
+mat-expansion-panel {
+  background: transparent;
+  box-shadow: none;
+}
+
+mat-expansion-panel-header {
+  padding: 0;
+}
+
+mat-expansion-panel-header mat-icon {
+  margin-right: 8px;
+}
+
+nav .mat-expansion-panel-content {
+  padding-left: 16px;
+}

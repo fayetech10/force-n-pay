@@ -5,6 +5,7 @@ import { jwtDecode } from 'jwt-decode';
 import { User } from '../interfaces/User';
 import { AuthResponse } from '../interfaces/AuthResponse';
 import { environment } from '../../environments/environment';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +15,7 @@ export class AuthService {
   public currentUser$ = this.currentUserSubject.asObservable();
   private apiUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) {
+  constructor(private router: Router, private http: HttpClient) {
     // Initialise l'utilisateur au démarrage si token valide
     const token = this.getToken();
     if (token) {
@@ -48,7 +49,6 @@ export class AuthService {
 
   private handleError(error: HttpErrorResponse) {
     let errorMessage = 'Une erreur inconnue s’est produite';
-
     if (error.error?.message) {
       errorMessage = error.error.message;
     } else if (error.status === 0) {
@@ -68,7 +68,7 @@ export class AuthService {
     sessionStorage.setItem('token', token);
   }
 
-  
+
 
   getUserFromToken(): User | null {
     const token = this.getToken();
@@ -98,5 +98,7 @@ export class AuthService {
   logout(): void {
     sessionStorage.removeItem('token');
     this.currentUserSubject.next(null);
+    sessionStorage.clear();
+    this.router.navigate(['/login']);
   }
 }

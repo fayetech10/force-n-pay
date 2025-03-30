@@ -3,6 +3,7 @@ import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { User } from '../../interfaces/User';
 
 @Component({
   selector: 'app-login',
@@ -16,7 +17,7 @@ export class LoginComponent implements OnInit {
   password: string = '';
   isLoading: boolean = false;
   errorMessage: string = '';
-
+  user!: User
   constructor(
     private authService: AuthService,
     private router: Router
@@ -24,18 +25,31 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {
     // Redirige les utilisateurs déjà connectés
-    if (this.authService.isAuthenticated()) {
-      this.router.navigate(['/dashboard']);
-    }
+    
   }
 
   login(): void {
     this.errorMessage = '';
     this.isLoading = true;
 
+
     this.authService.login(this.username, this.password).subscribe({
       next: () => {
-        this.router.navigate(['/dashboard']);
+        this.authService.getUserProfile().subscribe({
+          next: (user) => {
+            this.user = user
+            if (this.user.roles.includes("MENTOR")) {
+              this.router.navigate(["/dashboard"])
+            } else if (this.user.roles.includes("CONSULTANT")) {
+              this.router.navigate(["/dashboard/consultant"])
+            }
+          },
+          error: (error) => {
+            console.log(error)
+            this.isLoading = false
+          }
+        })
+
         this.isLoading = false;
       },
       error: (err) => {

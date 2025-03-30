@@ -1,0 +1,265 @@
+<div class="bg-gray-50 min-h-screen py-8 px-4 sm:px-6 lg:px-8 overflow-y-auto max-h-screen">
+    <div class="max-w-6xl mx-auto bg-white rounded-xl shadow-md overflow-hidden">
+        <!-- Mission Header -->
+        <div class="bg-gradient-to-r from-blue-500 to-indigo-600 p-6 text-white">
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center">
+                <div>
+                    <h1 class="text-2xl font-bold">{{ mission.name }}</h1>
+                    <span
+                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 mt-2">
+                        ID: {{ mission.id }}
+                    </span>
+                </div>
+                <div class="mt-4 sm:mt-0 text-blue-100">
+                    <div class="flex items-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <div>Début: {{ getFormattedDate(mission.dateDebut) }}</div>
+                    </div>
+                    <div class="flex items-center space-x-2 mt-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <div>Fin: {{ getFormattedDate(mission.dateFin) }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mission Body -->
+        <div class="p-6">
+            <!-- Progress Bar -->
+            <div class="mb-8">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-sm font-medium text-gray-500">Progrès de la mission</span>
+                    <span class="text-sm font-medium text-blue-600">{{ mission.progress }}%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                    <div class="bg-blue-600 h-2.5 rounded-full transition-all duration-500"
+                        [style.width.%]="mission.progress" role="progressbar" [attr.aria-valuenow]="mission.progress"
+                        aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+            </div>
+
+            <!-- Mission Info Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <!-- Objectif Card -->
+                <div class="bg-gray-50 border border-gray-100 rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <dt class="text-xs uppercase tracking-wider text-gray-500">Objectif</dt>
+                    <dd class="mt-1 text-gray-800 font-medium truncate">{{ mission.objectif }}</dd>
+                </div>
+
+                <!-- Description Card -->
+                <div class="bg-gray-50 border border-gray-100 rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <dt class="text-xs uppercase tracking-wider text-gray-500">Description</dt>
+                    <dd class="mt-1 text-gray-800 font-medium line-clamp-2">{{ mission.description }}</dd>
+                </div>
+
+                <!-- Budget Card -->
+                <div class="bg-gray-50 border border-gray-100 rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <dt class="text-xs uppercase tracking-wider text-gray-500">Budget</dt>
+                    <dd class="mt-1 text-gray-800 font-medium">{{ mission.budget | number }} €</dd>
+                </div>
+
+
+            </div>
+
+            <!-- rapports Section -->
+            <div class="mt-6">
+                <div
+                    class="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-gray-200 pb-4 mb-6 space-y-4 sm:space-y-0">
+                    <h2 class="text-xl font-bold text-gray-800">Rapports de mission</h2>
+                    <div class="flex flex-col xs:flex-row gap-2">
+                        <button (click)="showUploadForm = true" class="btn-primary flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4v16m8-8H4" />
+                            </svg>
+                            Ajouter un rapport
+                        </button>
+                        <button (click)="exportReports()" class="btn-secondary flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            Exporter
+                        </button>
+                    </div>
+                </div>
+
+                <ng-container *ngIf="rapports.length > 0; else noReports">
+                    <div class="border border-gray-200 rounded-lg overflow-hidden">
+                        <div
+                            class="max-h-[500px] overflow-y-auto p-2 scrollbar-thin scrollbar-thumb-blue-200 scrollbar-track-gray-100">
+                            <div *ngFor="let report of rapports"
+                                class="group relative border-b border-gray-100 last:border-0 hover:bg-gray-50 p-4 rounded-md transition-colors cursor-pointer"
+                                (click)="viewReport(report.id)">
+                                <div class="flex items-start justify-between space-x-4">
+                                    <!-- Indicator and Content -->
+                                    <div class="flex items-start space-x-4 min-w-0">
+                                        <div class="w-2 h-full bg-blue-500 rounded-full mt-1.5"></div>
+                                        <div class="min-w-0">
+                                            <h3 class="text-base font-medium text-gray-800 truncate">{{ report.title }}
+                                            </h3>
+                                            <p class="text-sm text-gray-500 mt-1 truncate">Créé par {{ report.author }}
+                                                • {{ report.date | date:'dd MMM yyyy' }}</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Actions -->
+                                    <div class="flex items-center space-x-4 flex-shrink-0">
+                                        <span class="text-sm text-gray-500 whitespace-nowrap">
+                                            {{ report.fileSize }}
+                                        </span>
+                                        <button class="text-blue-600 hover:text-blue-800 p-1 rounded-md">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+
+                <ng-template #noReports>
+                    <div class="bg-gray-50 rounded-lg p-8 text-center border-2 border-dashed border-gray-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <p class="mt-4 text-gray-600">Aucun rapport disponible pour cette mission</p>
+                        <button (click)="showUploadForm = true" class="btn-primary mt-4">
+                            Créer un premier rapport
+                        </button>
+                    </div>
+                </ng-template>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="showUploadForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="max-w-2xl w-full mx-4 bg-white rounded-lg shadow-md p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold">Uploader un rapport</h2>
+            <button (click)="showUploadForm = false" class="text-gray-500 hover:text-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <form (submit)="onSubmit()" #uploadForm="ngForm" class="space-y-4">
+            <div>
+                <label for="file" class="block text-sm font-medium text-gray-700 mb-1">
+                    Fichier PDF
+                    <span class="text-red-500">*</span>
+                </label>
+                <input type="file" id="file" (change)="onFileSelected($event)" accept=".pdf"
+                    class="block w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                    required>
+            </div>
+
+            <div>
+                <label for="titre" class="block text-sm font-medium text-gray-700 mb-1">
+                    Titre du rapport
+                    <span class="text-red-500">*</span>
+                </label>
+                <input type="text" id="titre" [(ngModel)]="titre" name="titre"
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    required>
+            </div>
+
+            <div>
+                <label for="missionId" class="block text-sm font-medium text-gray-700 mb-1">
+                    ID Mission
+                    <span class="text-red-500">*</span>
+                </label>
+                <input type="number" id="missionId" [(ngModel)]="mission.id" name="missionId" [value]="mission.id"
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    required>
+            </div>
+
+            <div *ngIf="errorMessage" class="p-4 text-sm text-red-700 bg-red-100 rounded-lg">
+                {{ errorMessage }}
+            </div>
+
+            <div class="flex justify-end space-x-2 pt-4">
+                <button type="button" (click)="showUploadForm = false"
+                    class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors">
+                    Annuler
+                </button>
+                <button type="submit" [disabled]="!selectedFile || !titre || !mission.id"
+                    class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                    Uploader
+                </button>
+            </div>
+
+            <div *ngIf="uploadCompleted" class="p-4 text-sm text-green-700 bg-green-100 rounded-lg">
+                ✔ Fichier uploadé avec succès
+            </div>
+        </form>
+    </div>
+</div>
+<div *ngIf="showFormUpdateMessionProgress"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="max-w-2xl w-full mx-4 bg-white rounded-lg shadow-md p-6 animate-fade-in">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold text-gray-800">Mise à jour de la progression</h2>
+            <button (click)="showFormUpdateMessionProgress = false"
+                class="text-gray-500 hover:text-gray-700 focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <div class="mb-6">
+            <label for="missionProgress" class="block text-sm font-medium text-gray-700 mb-2">
+                Progression actuelle: <span class="font-bold text-blue-600">{{ progressValue || mission.progress
+                    }}%</span>
+            </label>
+            <div class="flex items-center gap-4">
+                <input type="range" id="missionProgress" [(ngModel)]="progressValue" min="0" max="100"
+                    [value]="mission.progress"
+                    class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                <span class="text-sm font-medium w-12 text-center">{{ progressValue || mission.progress }}%</span>
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <label for="progressComment" class="block text-sm font-medium text-gray-700 mb-2">Commentaire
+                (optionnel)</label>
+            <textarea id="progressComment" [(ngModel)]="progressComment" rows="3"
+                class="w-full px-3 py-2 text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Ajoutez un commentaire concernant cette mise à jour..."></textarea>
+        </div>
+
+        <div class="flex justify-end gap-3 mt-6">
+            <button (click)="showFormUpdateMessionProgress = false"
+                class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                Annuler
+            </button>
+            <button (click)="updateMissionProgress()"
+                class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                Enregistrer
+            </button>
+        </div>
+    </div>
+</div>

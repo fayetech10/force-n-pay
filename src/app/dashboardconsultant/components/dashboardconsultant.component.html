@@ -1,0 +1,81 @@
+<!-- consultant-dashboard.component.html -->
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex">
+    <!-- Sidebar -->
+    <div class="fixed left-0 top-0 h-full w-72 bg-white dark:bg-gray-800 shadow-lg flex flex-col">
+        <!-- Profile section -->
+        <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex items-center gap-4">
+                <div
+                    class="h-12 w-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold shadow">
+                    C
+                </div>
+                <div>
+                    <h2 class="font-semibold text-gray-800 dark:text-white text-lg">John Consultant</h2>
+                    <p class="text-sm font-medium text-indigo-600 dark:text-indigo-400">Consultant Senior</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="px-4 py-6 space-y-2 flex-1">
+            <a routerLink="/dashboard/consultant"
+                routerLinkActive="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400"
+                class="flex items-center px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all cursor-pointer">
+                <mat-icon class="mr-3">home</mat-icon>
+                Accueil
+            </a>
+
+            <a routerLink="/dashboard/consultant/mission"
+                routerLinkActive="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400"
+                class="flex items-center px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all cursor-pointer">
+                <mat-icon class="mr-3">assignment</mat-icon>
+                Missions
+            </a>
+
+            <a routerLink="/dashboard/consultant/reports"
+                routerLinkActive="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400"
+                class="flex items-center px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all cursor-pointer">
+                <mat-icon class="mr-3">description</mat-icon>
+                Rapports
+            </a>
+
+            <a routerLink="/dashboard/consultant/payments"
+                routerLinkActive="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400"
+                class="flex items-center px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all cursor-pointer">
+                <mat-icon class="mr-3">payments</mat-icon>
+                Paiements
+            </a>
+
+            <a routerLink="/dashboard/consultant/settings"
+                routerLinkActive="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400"
+                class="flex items-center px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all cursor-pointer">
+                <mat-icon class="mr-3">settings</mat-icon>
+                Paramètres
+            </a>
+
+            <a routerLink="/dashboard/consultant/help"
+                routerLinkActive="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400"
+                class="flex items-center px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all cursor-pointer">
+                <mat-icon class="mr-3">help_center</mat-icon>
+                Aide
+            </a>
+        </nav>
+
+        <!-- Logout button -->
+        <div class="p-5 mt-auto border-t border-gray-200 dark:border-gray-700">
+            <a (click)="logout()"
+                class="flex items-center px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-all cursor-pointer">
+                <mat-icon class="mr-3">logout</mat-icon>
+                Déconnexion
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="ml-72 flex-1">
+        <div
+            class="bg-white dark:bg-gray-800 shadow-sm p-6 border border-gray-100 dark:border-gray-700 min-h-[calc(100vh-4rem)]">
+            <router-outlet></router-outlet>
+        </div>
+    </div>
+</div>

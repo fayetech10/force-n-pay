@@ -1,0 +1,125 @@
+@for(seance of seances; track seance){
+<div class="pb-4">
+    <mat-card
+        class="shadow-xl rounded-xl overflow-hidden transition-all duration-300 hover:shadow-2xl border border-gray-100">
+        <!-- En-tête avec dégradé -->
+        <div class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-5">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-xl font-bold mb-1">{{ formatDate(seance.date) | titlecase }}</h2>
+                    <div class="flex items-center text-blue-100">
+                        <mat-icon class="mr-2 text-blue-200">event_note</mat-icon>
+                        <p>{{ seance.activite }}</p>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center bg-white/10 backdrop-blur-sm px-4 py-2 rounded-lg">
+                    <mat-icon class="mr-2 text-blue-200">access_time</mat-icon>
+                    <span>{{ seance.heuresTotaux }} heures</span>
+                </div>
+            </div>
+        </div>
+
+        <mat-card-content class="p-5">
+            <!-- Section principale avec grille -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-3">
+                <!-- Horaire -->
+                <div
+                    class="bg-gradient-to-br from-blue-50 to-blue-100/50 p-5 rounded-xl shadow-sm border border-blue-100">
+                    <h3 class="text-lg font-semibold mb-3 text-indigo-800 flex items-center">
+                        <mat-icon class="mr-2">schedule</mat-icon>
+                        Horaire
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center bg-white/80 p-3 rounded-lg">
+                            <span class="font-medium text-gray-700">Début:</span>
+                            <span class="text-indigo-700 font-medium">{{ formatTime(seance.heureDebut) }}</span>
+                        </div>
+                        <div class="flex justify-between items-center bg-white/80 p-3 rounded-lg">
+                            <span class="font-medium text-gray-700">Fin:</span>
+                            <span class="text-indigo-700 font-medium">{{ formatTime(seance.heureFin) }}</span>
+                        </div>
+                        <div class="flex justify-between items-center md:hidden bg-white/80 p-3 rounded-lg">
+                            <span class="font-medium text-gray-700">Durée totale:</span>
+                            <span class="text-indigo-700 font-medium">{{ seance.heuresTotaux }} heures</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Groupe -->
+                <div
+                    class="bg-gradient-to-br from-emerald-50 to-emerald-100/50 p-5 rounded-xl shadow-sm border border-emerald-100">
+                    <h3 class="text-lg font-semibold mb-3 text-emerald-800 flex items-center">
+                        <mat-icon class="mr-2">groups</mat-icon>
+                        Groupe
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center bg-white/80 p-3 rounded-lg">
+                            <span class="font-medium text-gray-700">Cohorte:</span>
+                            <mat-chip class="bg-blue-600 text-white font-medium">{{ seance.cohorte?.nom }}</mat-chip>
+                        </div>
+                        <div class="flex justify-between items-center bg-white/80 p-3 rounded-lg">
+                            <span class="font-medium text-gray-700">Groupe:</span>
+                            <mat-chip class="bg-emerald-600 text-white font-medium">{{ seance.cohorte?.groupe?.nom
+                                }}</mat-chip>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Séparateur élégant -->
+            <div class="relative my-6">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-gray-200"></div>
+                </div>
+                <div class="relative flex justify-center">
+                    <div class="bg-white px-4 text-gray-500">
+                        <mat-icon>school</mat-icon>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section formateur -->
+            <div
+                class="bg-gradient-to-br from-purple-50 to-purple-100/50 p-5 rounded-xl shadow-sm border border-purple-100">
+                <h3 class="text-lg font-semibold mb-3 text-purple-800 flex items-center">
+                    <mat-icon class="mr-2">person</mat-icon>
+                    Formateur
+                </h3>
+
+                <div class="bg-white/80 p-4 rounded-lg flex flex-col sm:flex-row sm:justify-between sm:items-center">
+                    <div class="flex items-center mb-3 sm:mb-0">
+                        <div
+                            class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white h-12 w-12 rounded-full flex items-center justify-center font-medium mr-3 shadow-md">
+                            {{ seance.utilisateur?.prenom?.charAt(0) | uppercase }}{{ seance.utilisateur?.nom?.charAt(0)
+                            |
+                            uppercase }}
+                        </div>
+                        <div>
+                            <div class="font-medium text-gray-800">{{ seance.utilisateur?.prenom | titlecase }} {{
+                                seance.utilisateur?.nom | titlecase }}</div>
+                            <div class="text-gray-600 text-sm">{{ seance.utilisateur?.username }}</div>
+                        </div>
+                    </div>
+
+                    <a href="mailto:{{ seance.utilisateur?.email }}"
+                        class="group flex items-center bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-full text-indigo-700 transition-all duration-200">
+                        <mat-icon
+                            class="mr-2 text-indigo-500 group-hover:text-indigo-700 transition-colors duration-200">mail</mat-icon>
+                        <span class="text-sm">{{ seance.utilisateur?.email }}</span>
+                    </a>
+                </div>
+            </div>
+        </mat-card-content>
+
+        <!-- Actions -->
+        <div class="px-5 py-4 bg-gray-50 flex justify-end gap-3 border-t border-gray-100">
+          
+            <button mat-stroked-button color="primary"
+                class="rounded-full bg-gradient-to-r from-indigo-600 to-blue-600 text-white hover:from-indigo-700 hover:to-blue-700 transition-colors duration-200 px-5 py-1">
+                <mat-icon>visibility</mat-icon>
+                <span class="ml-1">Détails</span>
+            </button>
+        </div>
+    </mat-card>
+</div>
+}

@@ -12,6 +12,8 @@ import { AuthService } from '../services/auth.service';
 import { filter, map, mergeMap, Observable, Subject, Subscription, takeUntil } from 'rxjs';
 import { PageInfo } from '../interfaces/InfoPages';
 import { PageTitleService } from '../services/components/page.title.service';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { User } from '../interfaces/User';
 
 @Component({
   selector: 'app-layout',
@@ -27,6 +29,7 @@ import { PageTitleService } from '../services/components/page.title.service';
     MatMenuModule,
     MatListModule,
     TitleCasePipe,
+    MatExpansionModule
 
 
   ],
@@ -34,25 +37,39 @@ import { PageTitleService } from '../services/components/page.title.service';
   styleUrl: './layout.component.scss'
 })
 export class LayoutComponent implements OnInit, OnDestroy {
-
+  openProfileDialog() {
+    throw new Error('Method not implemented.');
+  }
+  isUserSubMenuOpen: boolean = false;
+  user!: User
+  toggleUserSubMenu(): void {
+    this.isUserSubMenuOpen = !this.isUserSubMenuOpen;
+  }
 
   navigation = [
     { path: '/dashboard', icon: 'dashboard', title: 'Accueil' },
     { path: '/missions', icon: 'assignment', title: 'Missions' },
-    { path: '/users', icon: 'people', title: 'Utilisateurs' },
+    // { path: '/users', icon: 'people', title: 'Utilisateurs' },
     { path: '/reports', icon: 'description', title: 'Rapports' },
+    { path: '/seances', icon: 'description', title: 'Seances' },
     { path: '/payments', icon: 'payments', title: 'Paiements' },
-    { path: '/mentorship', icon: 'school', title: 'Mentorat' }
+    // { path: '/mentorship', icon: 'school', title: 'Mentorat' }
+  ];
+  userSubNavigation = [
+    { path: '/users/mentor', icon: 'school', title: 'Mentor' },
+    { path: '/users/consultant', icon: 'business_center', title: 'Consultant' },
+    { path: '/users/validation-team', icon: 'verified_user', title: 'Équipe de validation' },
+    { path: '/users/admin', icon: 'admin_panel_settings', title: 'Admin' }
   ];
 
   notifications = [
-    { title: 'Nouvelle mission ajoutée', time: 'Il y a 5 minutes' ,icon: ""},
+    { title: 'Nouvelle mission ajoutée', time: 'Il y a 5 minutes', icon: "" },
     { title: 'Rapport soumis', time: 'Il y a 2 heures', icon: "" },
     { title: 'Paiement validé', time: 'Hier', icon: "" }
   ];
   currentPageTitle: any;
   isDarkMode = false;
-  user$!: any
+  user$!: User
   private destry$ = new Subject<void>()
   isLoading: boolean = false
   error: string | null = null
@@ -71,6 +88,25 @@ export class LayoutComponent implements OnInit, OnDestroy {
     this.checkAuthentication()
     this.loadProfile()
     this.loadCurrentPage()
+    this.logOut()
+  }
+  logOut(): void {
+    this.isLoading = true
+    this.authService.getUserProfile().subscribe({
+      next: (user) => {
+        this.user = user
+        if (!this.user.roles.includes("MENTOR")) {
+          console.log(this.user);
+          this.authService.logout()
+          this.isLoading = false
+        }
+      },
+      error: (error) => {
+        console.log(error);
+        this.isLoading = false
+
+      }
+    })
   }
 
   loadCurrentPage(): void {
@@ -93,6 +129,8 @@ export class LayoutComponent implements OnInit, OnDestroy {
       };
     });
   }
+
+
   getDefaultTitle(): string {
     // Extraire le nom de la page à partir de l'URL actuelle
     const url = this.router.url;
@@ -101,6 +139,8 @@ export class LayoutComponent implements OnInit, OnDestroy {
     if (segments.length === 0) {
       return 'Dashboard';
     }
+
+
 
     // Convertir première lettre en majuscule et remplacer les tirets par des espaces
     return segments[segments.length - 1]
@@ -132,11 +172,7 @@ export class LayoutComponent implements OnInit, OnDestroy {
     }
   }
 
-  logOut() {
-    this.authService.logout()
-    this.router.navigate(['/login'])
 
-  }
   toggleDarkMode() {
     throw new Error('Method not implemented.');
   }
