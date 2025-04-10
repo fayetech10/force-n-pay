@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import {EMPTY, map, Observable, switchMap} from 'rxjs';
 import { User } from '../../interfaces/User';
 import { UserDataService } from '../../services/components/UsersDataService.service';
 import { CommonModule } from '@angular/common';
@@ -18,6 +18,9 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { MatDialog } from '@angular/material/dialog';
 import { LoadingComponentComponent } from '../../components/loading-component/loading-component.component';
 import { CreateMentorComponent } from '../../components/mentor/create-mentor/create-mentor.component';
+import {MatMenu, MatMenuTrigger} from '@angular/material/menu';
+import ConfigCommandModule from '@angular/cli/src/commands/config/cli';
+import {MentorService} from '../../services/mentor.service';
 
 @Component({
   selector: 'app-mentor',
@@ -37,6 +40,8 @@ import { CreateMentorComponent } from '../../components/mentor/create-mentor/cre
     MatTooltipModule,
     ReactiveFormsModule,
     FormsModule,
+    MatMenuTrigger,
+    MatMenu,
   ],
   templateUrl: './mentor.component.html',
   styleUrl: './mentor.component.scss'
@@ -53,9 +58,7 @@ export class MentorComponent implements OnInit {
   toggleUserStatus(_t122: any) {
     throw new Error('Method not implemented.');
   }
-  deleteUser(_t122: any) {
-    throw new Error('Method not implemented.');
-  }
+
   editUser(_t122: any) {
     throw new Error('Method not implemented.');
   }
@@ -67,8 +70,10 @@ export class MentorComponent implements OnInit {
   mentor$!: Observable<User[]>
   isLoading: boolean = false
   mentors: User[] = []
+  searchText: any;
   constructor(
     private fb: FormBuilder,
+    private mentorService: MentorService,
     private matDialog: MatDialog,
     private userDataService: UserDataService) { }
   ngOnInit(): void {
@@ -103,7 +108,18 @@ export class MentorComponent implements OnInit {
       data: {}
     })
 
-
+      matDialogRef.afterClosed().subscribe({
+        next: (result) => {
+          if (result?.action === 'add'){
+            // this.loadMentors()
+            this.dataSource.data = [...this.mentors, result.data]
+            this.mentors = [...this.mentors, result.data]
+          }
+        },
+        error: (err) => {
+        console.log(err);
+        }
+      })
   }
 
   loadMentors(): void {
@@ -115,7 +131,6 @@ export class MentorComponent implements OnInit {
         message: "Le chargement est en cours",
       }
     })
-
     this.userDataService.loadUsers().pipe(
       map(mentors => mentors.filter(m => m.roles.includes("MENTOR")))
     ).subscribe({
@@ -135,4 +150,37 @@ export class MentorComponent implements OnInit {
   }
 
 
+  getActiveUsersCount() {
+    return "345";
+  }
+
+  getNewUsersCount() {
+    return "34";
+  }
+
+  applyFilter() {
+
+  }
+
+  confirmDelete(user: User) {
+        const  dialogRef = this.matDialog.open(ConfigCommandModule, {
+          data: {
+            title: 'Delete',
+            message: `Voulez-vous supprimer ${user.prenom}?`,
+            confirmText: 'Supprimer',
+            cancelText: 'Annuler',
+            confirmColor: 'warn'
+          },
+          width: "400px",
+
+        })
+
+    dialogRef.afterClosed().pipe(
+      switchMap(result => result ? "" : EMPTY)
+    )
+  }
+
+  getRoleIcon(roles: any) {
+    return "";
+  }
 }

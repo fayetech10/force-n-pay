@@ -38,10 +38,12 @@ export class LoginComponent implements OnInit {
         this.authService.getUserProfile().subscribe({
           next: (user) => {
             this.user = user
-            if (this.user.roles.includes("MENTOR")) {
+            if (this.user.roles.includes("ADMIN")) {
               this.router.navigate(["/dashboard"])
             } else if (this.user.roles.includes("CONSULTANT")) {
               this.router.navigate(["/dashboard/consultant"])
+            }else if(this.user.roles.includes("MENTOR")){
+              this.router.navigate(["/dashboard/mentor"])
             }
           },
           error: (error) => {

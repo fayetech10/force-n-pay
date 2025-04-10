@@ -9,7 +9,7 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { ActivatedRoute, NavigationEnd, Router, RouterModule, RouterOutlet } from '@angular/router';
 import { AuthService } from '../services/auth.service';
-import { filter, map, mergeMap, Observable, Subject, Subscription, takeUntil } from 'rxjs';
+import { delay, filter, map, mergeMap, Observable, Subject, Subscription, takeUntil } from 'rxjs';
 import { PageInfo } from '../interfaces/InfoPages';
 import { PageTitleService } from '../services/components/page.title.service';
 import { MatExpansionModule } from '@angular/material/expansion';
@@ -49,18 +49,20 @@ export class LayoutComponent implements OnInit, OnDestroy {
   navigation = [
     { path: '/dashboard', icon: 'dashboard', title: 'Accueil' },
     { path: '/missions', icon: 'assignment', title: 'Missions' },
-    // { path: '/users', icon: 'people', title: 'Utilisateurs' },
+    { path: '/users', icon: 'people', title: 'Utilisateurs' },
     { path: '/reports', icon: 'description', title: 'Rapports' },
     { path: '/seances', icon: 'description', title: 'Seances' },
     { path: '/payments', icon: 'payments', title: 'Paiements' },
     // { path: '/mentorship', icon: 'school', title: 'Mentorat' }
   ];
   userSubNavigation = [
+    { path: '/users/users', icon: 'group', title: 'Tous' },
     { path: '/users/mentor', icon: 'school', title: 'Mentor' },
     { path: '/users/consultant', icon: 'business_center', title: 'Consultant' },
     { path: '/users/validation-team', icon: 'verified_user', title: 'Équipe de validation' },
     { path: '/users/admin', icon: 'admin_panel_settings', title: 'Admin' }
   ];
+
 
   notifications = [
     { title: 'Nouvelle mission ajoutée', time: 'Il y a 5 minutes', icon: "" },
@@ -80,7 +82,7 @@ export class LayoutComponent implements OnInit, OnDestroy {
   constructor(
     private readonly authService: AuthService,
     private activatedRoute: ActivatedRoute,
-    private readonly router: Router) { }
+    private router: Router) { }
 
 
 
@@ -88,25 +90,29 @@ export class LayoutComponent implements OnInit, OnDestroy {
     this.checkAuthentication()
     this.loadProfile()
     this.loadCurrentPage()
-    this.logOut()
+    this.redirection()
   }
-  logOut(): void {
-    this.isLoading = true
-    this.authService.getUserProfile().subscribe({
-      next: (user) => {
-        this.user = user
-        if (!this.user.roles.includes("MENTOR")) {
-          console.log(this.user);
-          this.authService.logout()
-          this.isLoading = false
-        }
-      },
-      error: (error) => {
-        console.log(error);
-        this.isLoading = false
 
-      }
-    })
+  logOut() {
+    this.authService.logout()
+  }
+  redirection(): void {
+    this.isLoading = true
+    this.authService.getUserProfile()
+     
+      .subscribe({
+        next: (user) => {
+          this.user = user
+          if (!this.user.roles.includes("ADMIN")) {
+            this.router.navigate(["/login"])
+          }
+        },
+        error: (error) => {
+          console.log(error);
+          this.isLoading = false
+
+        }
+      })
   }
 
   loadCurrentPage(): void {

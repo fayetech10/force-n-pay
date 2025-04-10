@@ -23,12 +23,16 @@ import { MissionService } from '../../services/missions.service';
 import { Mission } from '../../interfaces/Mission';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ActivatedRoute } from '@angular/router';
-import { map, Observable, Subscription, tap } from 'rxjs';
+import { delay, finalize, map, Observable, Subscription, switchMap, tap } from 'rxjs';
 import { BaseChartDirective } from 'ng2-charts';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { User } from '../../interfaces/User';
 import { UserService } from '../../services/users.service';
 import { MissionDetailsComponentComponent } from '../../components/mission-details-component/mission-details-component.component';
+import { TruncatePipe } from "../../TruncatePipe";
+import { animate, query, stagger, style, transition, trigger } from '@angular/animations';
+import { Activity } from '../../interfaces/Actiites';
+import { ActivitesService } from '../../services/activites.service';
 
 // interface User {
 //   id: number;
@@ -59,14 +63,39 @@ import { MissionDetailsComponentComponent } from '../../components/mission-detai
     FormsModule,
     ReactiveFormsModule,
     DatePipe,
-
     MatProgressSpinnerModule,
     TitleCasePipe,
-
+    TruncatePipe
   ],
   standalone: true,
   templateUrl: './mission-management.component.html',
-  styleUrls: ['./mission-management.component.scss']
+  styleUrls: ['./mission-management.component.scss'],
+  animations: [
+    trigger('rowAnimation', [
+      transition('* <=> *', [
+        query(':enter', [
+          style({ opacity: 0, transform: 'translateY(-10px)' }),
+          stagger('50ms',
+            animate('300ms ease-out',
+              style({ opacity: 1, transform: 'translateY(0)' }))
+          )
+        ], { optional: true }),
+        query(':leave', animate('200ms', style({ opacity: 0 })), { optional: true })
+      ])
+    ]),
+    trigger('staggerSlideIn', [
+      transition('* => *', [
+        query(':enter', [
+          style({ opacity: 0, transform: 'translateX(-20px)' }),
+          stagger('100ms', [
+            animate('300ms cubic-bezier(0.35, 0, 0.25, 1)',
+              style({ opacity: 1, transform: 'translateX(0)' }))
+          ])
+        ], { optional: true })
+      ])
+    ])
+  ]
+
 })
 export class MissionManagementComponent implements OnInit, OnDestroy {
   objectif: any;
@@ -178,6 +207,8 @@ export class MissionManagementComponent implements OnInit, OnDestroy {
   ];
 
   missions$!: Observable<Mission[]>;
+  filter: string = '';
+  filteredMissions: Mission[] = [];
 
   constructor(
     private readonly dialog: MatDialog,
@@ -185,7 +216,8 @@ export class MissionManagementComponent implements OnInit, OnDestroy {
     private readonly missionService: MissionService,
     private readonly route: ActivatedRoute,
     private readonly snackbar: MatSnackBar,
-    private readonly userService: UserService
+    private readonly userService: UserService,
+    private readonly activityService: ActivitesService
   ) { }
   private subscription?: Subscription;
   ngOnDestroy(): void {
@@ -196,14 +228,58 @@ export class MissionManagementComponent implements OnInit, OnDestroy {
     this.initMissionForm();
     this.loadMissionByResolver();
     this.loadUsers()
+    this.applyFilter()
+  }
+
+
+  applyFilter() {
+    const filterValue = this.filter.toLowerCase();
+    this.filteredMissions = this.missions.data.filter(mission => {
+      return (
+        mission.name.toLowerCase().includes(filterValue) ||
+        mission.description?.toLowerCase().includes(filterValue) ||
+        mission.status_mission.toLowerCase().includes(filterValue) ||
+        mission.utilisateur?.nom.toLowerCase().includes(filterValue) ||
+        mission.progress.toString().includes(filterValue)
+      );
+    });
+  }
+
+  getStatusClass(status: string) {
+    switch (status) {
+      case 'Terminer':
+        return 'bg-green-100/80 dark:bg-green-900/30 text-green-800 dark:text-green-200';
+      case 'En Cour':
+        return 'bg-blue-100/80 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200';
+      default:
+        return 'bg-gray-100/80 dark:bg-gray-700 text-gray-800 dark:text-gray-300';
+    }
+  }
+
+  getProgressBarClass(mission: Mission) {
+    return {
+      'bg-blue-500': mission.status_mission === 'En Cours',
+      'bg-green-500': mission.status_mission === 'Terminé',
+      'bg-gray-400': mission.status_mission === 'En attente'
+    };
+  }
+
+  getProgressTextClass(mission: Mission) {
+    return {
+      'text-blue-600 dark:text-blue-400': mission.status_mission === 'En Cours',
+      'text-green-600 dark:text-green-400': mission.status_mission === 'Terminé',
+      'text-gray-500 dark:text-gray-400': mission.status_mission === 'En attente'
+    };
   }
   loadUsers(): void {
     this.users$ = this.userService.getAllUsers()
-
     this.users$.subscribe({
-
       next: (users) => {
-        this.users = users.filter(user => user.nom && user.nom.trim() !== '')
+        this.users = users.
+          filter(user => user.nom && user.nom.trim() !== '' && user.roles.includes("CONSULTANT"))
+      },
+      error: (err) => {
+        console.log(err)
       }
     })
   }
@@ -212,21 +288,22 @@ export class MissionManagementComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.missions$ = this.route.data.pipe(
       map(data => data['missions']),
-      tap(() => this.isLoading = false)
+      delay(1000),
+      tap({
+        next: (missions) => {
+          this.missions.data = missions
+          this.isLoading = false
 
+        },
+        error: (err) => {
+          console.log("Erreur lors du chargement", err)
+          this.isLoading = false
+        }
+      }),
+      finalize(() => this.isLoading = false)
     );
 
-    this.missions$.subscribe({
-      next: (missions) => {
-        this.missions.data = missions
-        this.isLoading = false
-      },
-      error: (err) => {
-        console.log("Erreur lors du chargement", err)
-        this.isLoading = false
-      }
-    }
-    );
+    this.missions$.subscribe()
   }
   initMissionForm(): void {
     this.missionForm = this.fb.group({
@@ -279,7 +356,7 @@ export class MissionManagementComponent implements OnInit, OnDestroy {
     });
   }
   saveMission(): void {
-    this.isSaving = true
+    this.isSaving = true;
     if (this.missionForm.invalid) return;
 
     const missionData: Mission = this.missionForm.value;
@@ -287,9 +364,24 @@ export class MissionManagementComponent implements OnInit, OnDestroy {
       ? this.missionService.updateMission({ ...missionData, id: this.currentMissionId })
       : this.missionService.addMission(missionData);
 
-    operation$.subscribe({
-      next: (savedMission) => {
-        this.refreshMissionsData(savedMission);
+    operation$.pipe(
+      finalize(() => this.isSaving = false),
+      switchMap(savedMission => {
+        const activity: Activity = {
+          name: 'Nouvelle mission ajoutée',
+          date: new Date().toISOString(), // Date obligatoire
+          missionId: savedMission.id,
+          // Ajouter les propriétés obligatoires manquantes
+          paiement: null,
+          seance: null,
+          rapport: null
+        };
+        return this.activityService.addActivity(activity);
+      })
+    ).subscribe({
+      next: (activityResponse) => {
+        console.log('Activité enregistrée:', activityResponse);
+
         this.snackbar.open(`Mission ${this.editMode ? 'mise à jour' : 'ajoutée'} !`, 'Fermer', {
           duration: 3000
         });
@@ -297,16 +389,8 @@ export class MissionManagementComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         console.error(`Erreur ${this.editMode ? 'mise à jour' : 'ajout'}`, error);
-
       }
     });
-
-    operation$.subscribe({
-      next: () => this.isSaving = false,
-      error: () => this.isSaving = false
-    });
-
-
   }
   refreshMissionsData(updatedMission: Mission) {
     this.missionService.getMissions().subscribe(missions => {

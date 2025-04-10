@@ -3,7 +3,7 @@
     <div class="relative">
         <div class="absolute top-0 right-0 h-2 w-full" [ngClass]="{
       'bg-green-500': data.mission.status_mission === 'Termine',
-      'bg-blue-500': data.mission.status_mission === 'En Cours',
+      'bg-blue-500': data.mission.status_mission === 'En Cour',
       'bg-gray-300': data.mission.status_mission === 'En attente'
     }"></div>
 
@@ -116,5 +116,9 @@
         <button mat-flat-button color="primary" class="rounded-full px-6" (click)="onClose()">
             Fermer
         </button>
+
+      <button mat-button *ngIf="data.mission.status_mission === 'Terminer'" (click)="paiement(data.mission)">
+          Passer au payment
+      </button>
     </div>
 </div>

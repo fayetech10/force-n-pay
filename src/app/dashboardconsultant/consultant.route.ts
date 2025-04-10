@@ -6,6 +6,9 @@ import { ReportsComponent } from "./reports/reports.component";
 
 export const ConsultantRoute: Routes = [
     {
+        path: "", component: HomeComponent
+    },
+    {
         path: "mission", component: MissionComponent
     },
     {
@@ -15,8 +18,5 @@ export const ConsultantRoute: Routes = [
         path: "payments", component: PaymentsComponent
     },
 
-    {
-        path: "", component: HomeComponent
-    },
 
 ];

@@ -33,7 +33,7 @@ export class MissionService {
             mission,
             { headers: this.authconfig.createAuthHeaders() }
         ).pipe(catchError(this.authconfig.handleError));
-    }
+    }   
 
     // Met à jour une mission existante
     updateMission(mission: Mission): Observable<Mission> {

@@ -1,31 +1,25 @@
-/* Harmonisation des icônes */
-.icon-outlined {
-  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+.animate-gradient-x {
+    background-size: 200% 200%;
+    animation: gradient-x 3s ease infinite;
 }
 
-/* Correction des espacements Material */
-.mat-menu-panel {
-  border-radius: 0.75rem !important;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1) !important;
+@keyframes gradient-x {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
 
-.mat-badge-accent .mat-badge-content {
-  background-color: #3b82f6 !important;
-  color: white !important;
-}
-mat-expansion-panel {
-  background: transparent;
-  box-shadow: none;
+.animate-fade-in-up {
+    animation: fade-in-up 0.4s ease-out;
 }
 
-mat-expansion-panel-header {
-  padding: 0;
-}
-
-mat-expansion-panel-header mat-icon {
-  margin-right: 8px;
-}
-
-nav .mat-expansion-panel-content {
-  padding-left: 16px;
+@keyframes fade-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

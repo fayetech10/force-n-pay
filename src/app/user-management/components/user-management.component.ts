@@ -101,7 +101,13 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   }
   loadUsersFromApi(): void {
     this.users = this.usersDataService.users$
-    this.usersDataService.loadUsers().subscribe(users => console.log(users))
+    this.usersDataService.loadUsers().subscribe({
+      next: (users) => {
+        this.dataSource = new MatTableDataSource(users)
+        this.totalUsers = users.length
+        this.activeUsersCount = users.filter(user => user.actif == true).length
+      }
+    })
   }
   ngOnDestroy(): void {
     this.destroy$.next();
@@ -333,7 +339,6 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     this.users$.subscribe({
       next: (users) => {
         this.dataSource = new MatTableDataSource(users)
-        console.log(users);
 
       },
       error: (error) => {

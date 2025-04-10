@@ -1,147 +1,173 @@
 <form [formGroup]="mentorForm" (ngSubmit)="onSubmit()"
-    class="container max-w-4xl mx-auto px-4 py-12 h-screen flex flex-col">
-    <div class="text-center mb-6">
-        <h2 class="text-4xl font-extralight text-gray-800 tracking-tight mb-4">Inscription Mentor</h2>
-        <p class="text-gray-500 max-w-xl mx-auto">Créez votre profil professionnel avec simplicité et précision</p>
-    </div>
+      class="container max-w-4xl mx-auto px-4 py-8 h-screen flex flex-col">
+  <div class="text-center mb-6">
+    <h2 class="text-4xl font-extralight text-gray-800 tracking-tight mb-4">Inscription Mentor</h2>
+    <p class="text-gray-500 max-w-xl mx-auto">Créez votre profil professionnel avec simplicité et précision</p>
+  </div>
 
-    <div class="flex-grow overflow-y-auto pr-4 scrollbar-thin scrollbar-thumb-indigo-200 scrollbar-track-gray-100">
-        <div class="space-y-8">
-            <div class="grid md:grid-cols-2 gap-6">
-                <!-- Nom & Prénom -->
-                <div class="space-y-6">
-                    <div>
-                        <label class="block mb-2 text-sm font-medium text-gray-700">Nom</label>
-                        <input type="text" formControlName="nom" class="w-full px-4 py-3 border-b-2 border-gray-300 focus:border-indigo-500 
+  <div class="flex-grow overflow-y-auto pr-4 scrollbar-thin scrollbar-thumb-indigo-200 scrollbar-track-gray-100">
+    <div class="space-y-8">
+      <div class="grid md:grid-cols-2 gap-6">
+        <!-- Nom & Prénom -->
+        <div class="space-y-6">
+          <div>
+            <label class="block mb-2 text-sm font-medium text-gray-700">Nom</label>
+            <input type="text" formControlName="nom" class="w-full px-4 py-3 border-b-2 border-gray-300 focus:border-indigo-500
                                    transition-colors duration-300 bg-transparent text-gray-800
                                    focus:outline-none"
-                            [class.border-red-500]="mentorForm.get('nom')?.invalid && mentorForm.get('nom')?.touched">
-                        <div *ngIf="mentorForm?.get('nom')?.invalid && mentorForm?.get('nom')?.touched"
-                            class="text-red-500 text-xs mt-1">
-                            Nom requis
-                        </div>
-                    </div>
+                   [ngClass]="{'border-red-500': mentorForm.get('nom')?.invalid && mentorForm.get('nom')?.touched}">
+            <div *ngIf="mentorForm.get('nom')?.invalid && mentorForm.get('nom')?.touched"
+                 class="text-red-500 text-xs mt-1">
+              Nom requis
+            </div>
+          </div>
 
-                    <div>
-                        <label class="block mb-2 text-sm font-medium text-gray-700">Prénom</label>
-                        <input type="text" formControlName="prenom" class="w-full px-4 py-3 border-b-2 border-gray-300 focus:border-indigo-500 
+          <div>
+            <label class="block mb-2 text-sm font-medium text-gray-700">Prénom</label>
+            <input type="text" formControlName="prenom" class="w-full px-4 py-3 border-b-2 border-gray-300 focus:border-indigo-500
                                    transition-colors duration-300 bg-transparent text-gray-800
                                    focus:outline-none"
-                            [class.border-red-500]="mentorForm.get('prenom')?.invalid && mentorForm.get('prenom')?.touched">
-                        <div *ngIf="mentorForm.get('prenom')?.invalid && mentorForm.get('prenom')?.touched"
-                            class="text-red-500 text-xs mt-1">
-                            Prénom requis
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Contact & Identifiant -->
-                <div class="space-y-6">
-                    <div>
-                        <label class="block mb-2 text-sm font-medium text-gray-700">Email</label>
-                        <input type="email" formControlName="email" class="w-full px-4 py-3 border-b-2 border-gray-300 focus:border-indigo-500 
-                                   transition-colors duration-300 bg-transparent text-gray-800
-                                   focus:outline-none">
-                        <div *ngIf="mentorForm.get('email')?.invalid && mentorForm.get('email')?.touched"
-                            class="text-red-500 text-xs mt-1">
-                            Email invalide
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block mb-2 text-sm font-medium text-gray-700">Mot de passe</label>
-                        <input type="password" formControlName="password" class="w-full px-4 py-3 border-b-2 border-gray-300 focus:border-indigo-500 
-                                   transition-colors duration-300 bg-transparent text-gray-800
-                                   focus:outline-none">
-                        <div *ngIf="mentorForm.get('password')?.invalid && mentorForm.get('password')?.touched"
-                            class="text-red-500 text-xs mt-1">
-                            Minimum 6 caractères
-                        </div>
-                    </div>
-                </div>
+                   [ngClass]="{'border-red-500': mentorForm.get('prenom')?.invalid && mentorForm.get('prenom')?.touched}">
+            <div *ngIf="mentorForm.get('prenom')?.invalid && mentorForm.get('prenom')?.touched"
+                 class="text-red-500 text-xs mt-1">
+              Prénom requis
             </div>
-
-            <!-- Profil Détaillé -->
-            <div class="bg-gray-50/50 p-6 rounded-xl border border-gray-100 space-y-6">
-                <h3 class="text-xl font-medium text-gray-800 mb-4">Détails Professionnels</h3>
-
-                <div class="grid md:grid-cols-3 gap-6">
-                    <div>
-                        <label class="block mb-2 text-sm font-medium text-gray-700">Téléphone</label>
-                        <input type="text" formControlName="telephone" class="w-full px-4 py-3 border-b-2 border-gray-300 focus:border-indigo-500 
-                                   transition-colors duration-300 bg-transparent text-gray-800
-                                   focus:outline-none">
-                    </div>
-
-                    <div>
-                        <label class="block mb-2 text-sm font-medium text-gray-700">Date de naissance</label>
-                        <input type="date" formControlName="dateNaissance" class="w-full px-4 py-3 border-b-2 border-gray-300 focus:border-indigo-500 
-                                   transition-colors duration-300 bg-transparent text-gray-800
-                                   focus:outline-none">
-                    </div>
-
-                    <div>
-                        <label class="block mb-2 text-sm font-medium text-gray-700">Taux horaire (€)</label>
-                        <input type="number" formControlName="mentorProfile.hourlyRate" class="w-full px-4 py-3 border-b-2 border-gray-300 focus:border-indigo-500 
-                                   transition-colors duration-300 bg-transparent text-gray-800
-                                   focus:outline-none">
-                    </div>
-                </div>
-
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block mb-2 text-sm font-medium text-gray-700">Adresse</label>
-                        <input type="text" formControlName="adress" class="w-full px-4 py-3 border-b-2 border-gray-300 focus:border-indigo-500 
-                                   transition-colors duration-300 bg-transparent text-gray-800
-                                   focus:outline-none">
-                    </div>
-
-                    <div>
-                        <label class="block mb-2 text-sm font-medium text-gray-700">IBAN</label>
-                        <input type="text" formControlName="iban" class="w-full px-4 py-3 border-b-2 border-gray-300 focus:border-indigo-500 
-                                   transition-colors duration-300 bg-transparent text-gray-800
-                                   focus:outline-none">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Qualifications Dynamiques -->
-            <div formArrayName="mentorProfile.qualifications" class="space-y-4">
-                <label class="block text-sm font-medium text-gray-700">Qualifications</label>
-                <div *ngFor="let qualification of qualifications.controls; let i = index"
-                    class="flex items-center space-x-2">
-                    <input type="text" [formControlName]="i" class="flex-grow px-4 py-2 border-b border-gray-300 focus:border-indigo-500 
-                               transition-colors duration-300 bg-transparent text-gray-800
-                               focus:outline-none" placeholder="Diplôme, certification...">
-                    <button type="button" (click)="removeQualification(i)"
-                        class="text-red-500 hover:text-red-700 transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                    </button>
-                </div>
-                <button type="button" (click)="addQualification()"
-                    class="text-indigo-600 hover:text-indigo-800 flex items-center text-sm mt-2 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-lienjoin="round" stroke-width="2"
-                            d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                    Ajouter une qualification
-                </button>
-            </div>
+          </div>
         </div>
-    </div>
 
-    <!-- Bouton Soumission -->
-    <div class="mt-6">
-        <button type="submit" class="w-full py-4 bg-indigo-500 text-white rounded-full hover:bg-indigo-600 
+        <!-- Contact & Identifiant -->
+        <div class="space-y-6">
+          <div>
+            <label class="block mb-2 text-sm font-medium text-gray-700">Email</label>
+            <input type="email" formControlName="email" class="w-full px-4 py-3 border-b-2 border-gray-300 focus:border-indigo-500
+                                   transition-colors duration-300 bg-transparent text-gray-800
+                                   focus:outline-none"
+                   [ngClass]="{'border-red-500': mentorForm.get('email')?.invalid && mentorForm.get('email')?.touched}">
+            <div *ngIf="mentorForm.get('email')?.invalid && mentorForm.get('email')?.touched"
+                 class="text-red-500 text-xs mt-1">
+              Email invalide
+            </div>
+          </div>
+
+          <div>
+            <label class="block mb-2 text-sm font-medium text-gray-700">Mot de passe</label>
+            <input type="password" formControlName="password" class="w-full px-4 py-3 border-b-2 border-gray-300 focus:border-indigo-500
+                                   transition-colors duration-300 bg-transparent text-gray-800
+                                   focus:outline-none"
+                   [ngClass]="{'border-red-500': mentorForm.get('password')?.invalid && mentorForm.get('password')?.touched}">
+            <div *ngIf="mentorForm.get('password')?.invalid && mentorForm.get('password')?.touched"
+                 class="text-red-500 text-xs mt-1">
+              Minimum 6 caractères
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profil Détaillé -->
+      <div class="bg-gray-50/50 p-6 rounded-xl border border-gray-100 space-y-6">
+        <h3 class="text-xl font-medium text-gray-800 mb-4">Détails Professionnels</h3>
+
+        <div class="grid md:grid-cols-3 gap-6">
+          <div>
+            <label class="block mb-2 text-sm font-medium text-gray-700">Téléphone</label>
+            <input type="text" formControlName="telephone" class="w-full px-4 py-3 border-b-2 border-gray-300 focus:border-indigo-500
+                                   transition-colors duration-300 bg-transparent text-gray-800
+                                   focus:outline-none"
+                   [ngClass]="{'border-red-500': mentorForm.get('telephone')?.invalid && mentorForm.get('telephone')?.touched}">
+            <div *ngIf="mentorForm.get('telephone')?.invalid && mentorForm.get('telephone')?.touched"
+                 class="text-red-500 text-xs mt-1">
+              Téléphone requis
+            </div>
+          </div>
+
+          <div>
+            <label class="block mb-2 text-sm font-medium text-gray-700">Date de naissance</label>
+            <input type="date" formControlName="dateNaissance" class="w-full px-4 py-3 border-b-2 border-gray-300 focus:border-indigo-500
+                                   transition-colors duration-300 bg-transparent text-gray-800
+                                   focus:outline-none">
+          </div>
+
+          <div *ngIf="mentorForm.get('roles')?.value === 'MENTOR'">
+            <label class="block mb-2 text-sm font-medium text-gray-700">Taux horaire (€)</label>
+            <input type="number" formControlName="mentorProfile.hourlyRate" class="w-full px-4 py-3 border-b-2 border-gray-300 focus:border-indigo-500
+                                   transition-colors duration-300 bg-transparent text-gray-800
+                                   focus:outline-none"
+                   [ngClass]="{'border-red-500': mentorForm.get('mentorProfile.hourlyRate')?.invalid && mentorForm.get('mentorProfile.hourlyRate')?.touched}">
+            <div *ngIf="mentorForm.get('mentorProfile.hourlyRate')?.invalid && mentorForm.get('mentorProfile.hourlyRate')?.touched"
+                 class="text-red-500 text-xs mt-1">
+              Taux horaire requis et doit être positif
+            </div>
+          </div>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <label class="block mb-2 text-sm font-medium text-gray-700">Adresse</label>
+            <input type="text" formControlName="adress" class="w-full px-4 py-3 border-b-2 border-gray-300 focus:border-indigo-500
+                                   transition-colors duration-300 bg-transparent text-gray-800
+                                   focus:outline-none"
+                   [ngClass]="{'border-red-500': mentorForm.get('adress')?.invalid && mentorForm.get('adress')?.touched}">
+            <div *ngIf="mentorForm.get('adress')?.invalid && mentorForm.get('adress')?.touched"
+                 class="text-red-500 text-xs mt-1">
+              Adresse requise
+            </div>
+          </div>
+
+          <div>
+            <label class="block mb-2 text-sm font-medium text-gray-700">IBAN</label>
+            <input type="text" formControlName="iban" class="w-full px-4 py-3 border-b-2 border-gray-300 focus:border-indigo-500
+                                   transition-colors duration-300 bg-transparent text-gray-800
+                                   focus:outline-none"
+                   [ngClass]="{'border-red-500': mentorForm.get('iban')?.invalid && mentorForm.get('iban')?.touched}">
+            <div *ngIf="mentorForm.get('iban')?.invalid && mentorForm.get('iban')?.touched"
+                 class="text-red-500 text-xs mt-1">
+              IBAN requis
+            </div>
+          </div>
+        </div>
+
+        <!-- Sélection du rôle -->
+        <div>
+          <label class="block mb-2 text-sm font-medium text-gray-700">Rôle</label>
+          <select formControlName="roles" class="w-full px-4 py-3 border-b-2 border-gray-300 focus:border-indigo-500
+                                transition-colors duration-300 bg-transparent text-gray-800
+                                focus:outline-none">
+            <option *ngFor="let role of roles" [value]="role">{{ role }}</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Qualifications en Checkbox (visible seulement pour les mentors) -->
+      <div *ngIf="mentorForm.get('roles')?.value === 'MENTOR'" class="bg-gray-50/50 p-6 rounded-xl border border-gray-100">
+        <h3 class="text-xl font-medium text-gray-800 mb-4">Qualifications</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" formArrayName="mentorProfile.qualification">
+          <div *ngFor="let qualification of qualifications; let i = index" class="flex items-center">
+            <input
+              type="checkbox"
+              [formControlName]="i"
+              class="h-5 w-5 text-indigo-500 border-gray-300 rounded focus:ring-indigo-500"
+              id="qualification-{{i}}">
+            <label for="qualification-{{i}}" class="ml-2 text-sm text-gray-700">
+              {{ qualification.name }}
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Boutons d'action -->
+  <div class="mt-6 flex gap-4">
+    <button type="button" (click)="onCancel()" class="w-1/3 py-4 bg-gray-300 text-gray-700 rounded-full hover:bg-gray-400
+                   transition-colors duration-300 ease-in-out
+                   focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2">
+      Annuler
+    </button>
+    <button type="submit" class="w-2/3 py-4 bg-indigo-500 text-white rounded-full hover:bg-indigo-600
                    transition-colors duration-300 ease-in-out transform hover:scale-[1.02]
                    focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2
                    disabled:opacity-50 disabled:cursor-not-allowed" [disabled]="!mentorForm.valid">
-            Créer mon profil mentor
-        </button>
-    </div>
+      Créer mon profil mentor
+    </button>
+  </div>
 </form>

@@ -14,7 +14,7 @@ export class SeanceService {
         private readonly authServiceConf: AuthServiceConfig
     ) { }
 
-    private baseAp = "api"
+    private baseAp = "/api"
     getAllSeance(): Observable<Seance[]> {
         return this.http.get<Seance[]>(`${this.baseAp}/forc-n/v1/seance`, { headers: this.authServiceConf.createAuthHeaders() }).pipe(
             catchError((err) => this.authServiceConf.handleError(err))

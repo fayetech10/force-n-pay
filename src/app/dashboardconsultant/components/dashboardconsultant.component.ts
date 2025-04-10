@@ -40,11 +40,12 @@ export class DashboardconsultantComponent implements OnInit {
     this.loadMissions()
   }
 
-
   logout(): void {
     this.authService.logout()
     this.router.navigate(["/login"])
   }
+
+  
   loadMissions(): void {
     this.isloading = true
     this.missionDataService.loadMissions().subscribe({
@@ -56,7 +57,7 @@ export class DashboardconsultantComponent implements OnInit {
         console.log(error)
       }
     })
-    
+
   }
 
   openDispute(payment: any) {

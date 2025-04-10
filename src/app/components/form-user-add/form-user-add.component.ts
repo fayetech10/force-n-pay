@@ -72,7 +72,7 @@ export class FormUserAddComponent {
     });
 
     this.professionalInfoForm = this.fb.group({
-      iban: [''],
+      iban: ['', [Validators.required]],
       hourlyRate: [0, [Validators.required, Validators.min(0)]],
       qualifications: ["", [Validators.required, commaSeparatedValidator]],
       roles: ['', [Validators.required, commaSeparatedValidator]]

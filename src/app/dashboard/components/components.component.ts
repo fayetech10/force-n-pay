@@ -18,6 +18,16 @@ import { Chart, ChartData, ChartOptions, registerables } from 'chart.js';
 import { MatTableModule } from '@angular/material/table';
 import { User } from '../../interfaces/User';
 import { AuthService } from '../../services/auth.service';
+import { MissionService } from '../../services/missions.service';
+import { Mission } from '../../interfaces/Mission';
+import { ActivitesService } from '../../services/activites.service';
+import { Activity } from '../../interfaces/Actiites';
+import { TimelineItem } from '../../interfaces/TimelineItem';
+import { MatDialog } from '@angular/material/dialog';
+import { MissionShowComponent } from '../../components/activity/mission-show/mission-show.component';
+import { RapportShowComponent } from '../../components/activity/rapport-show/rapport-show.component';
+import { SeanceShowComponent } from '../../components/activity/seance-show/seance-show.component';
+import { PaiementShowComponent } from '../../components/activity/paiement-show/paiement-show.component';
 @Component({
   selector: 'app-components',
   standalone: true,
@@ -43,26 +53,57 @@ import { AuthService } from '../../services/auth.service';
   styleUrls: ['./components.component.scss']  // Fix: changed styleUrl to styleUrls
 })
 export class ComponentsComponent implements OnInit {
+  onClick(timelineItems: any) {
+    if (timelineItems.data.mission) {
+      this.dialog.open(MissionShowComponent, {
+        width: "1000px",
+        data: { mission: timelineItems.data.mission }
+      })
+    } else if (timelineItems.data.rapport) {
+      this.dialog.open(RapportShowComponent, {
+        width: "1000px",
+        data: { rapport: timelineItems.data.rapport }
+      })
+    } else if (timelineItems.data.seance) {
+      this.dialog.open(SeanceShowComponent, {
+        width: "1000px",
+        data: { seance: timelineItems.data.seance }
+      })
+    } else if (timelineItems.data.paiement) {
+      this.dialog.open(PaiementShowComponent, {
+        width: "1000px",
+        data: { paiement: timelineItems.data.paiement }
+      })
+    }
+
+
+
+  }
+
 
   // Données pour le graphique circulaire des missions
   missionChartData = [25, 12, 5]; // En cours, Terminées, En attente
   missionChartLabels = ['En cours', 'Terminées', 'En attente'];
   missionChartColors = ['#3B82F6', '#10B981', '#9CA3AF'];
   user!: User
+  missions: Mission[] = []
+  allMissions: Mission[] = [];
+  dataSource: Mission[] = [];
+  filterStatus: string = 'all';
+  activitiess: Activity[] = []
+  timelineItems: TimelineItem[] = []
+
+
+  missionStatus: string = ''
 
   displayedColumns: string[] = ['name', 'status', 'user', 'date', 'actions'];
-  recentMissions = [
-    { id: 'M-042', name: 'Développement UI', status: 'En cours', user: 'Jean Dupont', date: '15 mars 2025' },
-    { id: 'M-041', name: 'Audit de sécurité', status: 'Terminée', user: 'Marie Laurent', date: '12 mars 2025' },
-    { id: 'M-040', name: 'Migration de base de données', status: 'En attente', user: 'Thomas Bernard', date: '10 mars 2025' },
-    { id: 'M-039', name: 'Test d\'intégration', status: 'En cours', user: 'Sophie Martin', date: '8 mars 2025' }
-  ];
-  dataSource = this.recentMissions
+
   isLoading: boolean = false
+  isFilterLoading: boolean = false
   constructor(
-    private route: ActivatedRoute,
-    private authService: AuthService,
-    private router: Router
+    private dialog: MatDialog,
+    private missionService: MissionService,
+    private activityService: ActivitesService,
   ) {
     Chart.register(...registerables)
   }
@@ -89,6 +130,7 @@ export class ComponentsComponent implements OnInit {
       }
     ]
   };
+
 
 
   // Options des graphiques
@@ -195,9 +237,143 @@ export class ComponentsComponent implements OnInit {
   ngOnInit(): void {
     this.checkDarkMode();
     this.setupChartTheme();
+    this.loadMissions()
+    this.loadActivity()
 
   }
- 
+  loadActivity(): void {
+    this.activityService.getAllActivity().subscribe({
+      next: (activities) => {
+        this.activitiess = activities
+          .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+          .slice(0, 5);
+
+        this.processActivitiesToTimeline();
+      },
+      error: (err) => {
+        console.error('Erreur lors du chargement des activités :', err.message);
+      }
+    });
+  }
+
+  processActivitiesToTimeline() {
+    this.timelineItems = this.activitiess.map(activity => {
+      const date = new Date(activity.date)
+      let typeConfig
+
+      if (activity.mission) {
+        typeConfig = this.getMissionConfig(activity.mission);
+      } else if (activity.seance) {
+        typeConfig = this.getSessionConfig(activity.seance);
+      } else if (activity.paiement) {
+        typeConfig = this.getPaymentConfig(activity.paiement);
+      } else if (activity.rapport) {
+        typeConfig = this.getReportConfig(activity.rapport);
+      }
+
+      return {
+        icon: typeConfig?.icon || 'help',
+        color: typeConfig?.color || 'gray',
+        title: activity.name,
+        data: activity,
+        time: this.getTimeAgo(date),
+        ...typeConfig?.extra
+      }
+
+    })
+  }
+  private getMissionConfig(activity: any) {
+    return {
+      icon: 'add_circle',
+      color: 'blue',
+      data: activity,
+      extra: {
+        subtitle: activity.mission?.name || ''
+      }
+    };
+  }
+
+  private getSessionConfig(activity: any) {
+    return {
+      icon: 'people',
+      color: 'purple',
+      data: activity,
+      extra: {
+        badge: 'Nouveau'
+      }
+    };
+  }
+
+  private getPaymentConfig(activity: any) {
+    return {
+      icon: 'check_circle',
+      color: 'green',
+      data: activity,
+
+      extra: {
+        subtitle: activity.paiement?.mission?.name || ''
+      }
+    };
+  }
+
+  private getReportConfig(activity: any) {
+    return {
+      icon: activity.rapport?.statut === 'rejeté' ? 'cancel' : 'assignment',
+      data: activity,
+      color: activity.rapport?.statut === 'rejeté' ? 'red' : 'amber',
+      extra: {
+        warning: activity.rapport?.commentaire
+      }
+    };
+  }
+
+  private getTimeAgo(date: Date): string {
+    const now = new Date();
+    const diff = Math.abs(now.getTime() - date.getTime());
+    const minutes = Math.floor(diff / (1000 * 60));
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+
+    if (days > 0) return `Il y a ${days} jour${days > 1 ? 's' : ''}`;
+    if (hours > 0) return `Il y a ${hours} heure${hours > 1 ? 's' : ''}`;
+    return `Il y a ${minutes} minute${minutes > 1 ? 's' : ''}`;
+  }
+
+
+  loadMissions(): void {
+    this.isLoading = true
+    this.missionService.getMissions().subscribe({
+      next: (missions) => {
+        this.allMissions = missions.slice(0, 6)
+        this.applyFilter('all')
+        setTimeout(() => {
+          this.isLoading = false
+        }, 1000);
+
+      },
+      error: (err) => {
+        console.log(err)
+        this.isLoading = false
+      }
+    })
+  }
+  applyFilter(status: string): void {
+    this.isFilterLoading = true;
+    this.filterStatus = status;
+
+    // Donne un cycle de rendu à Angular pour afficher le spinner
+    setTimeout(() => {
+      let missionsFiltrées = this.allMissions;
+
+      if (status !== 'all') {
+        missionsFiltrées = this.allMissions.filter(m => m.status_mission === status);
+      }
+
+      this.dataSource = missionsFiltrées;
+      this.isFilterLoading = false;
+    }, 100);
+  }
+
 
   checkDarkMode(): void {
     const darkModeEnabled = localStorage.getItem('darkMode') === 'true';

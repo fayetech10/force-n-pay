@@ -1,19 +1,19 @@
 import { Routes } from "@angular/router";
-import { MissionManagementComponent } from "./mission-management/components/mission-management.component";
-import { UserManagementComponent } from "./user-management/components/user-management.component";
-import { PaymentTrackingComponent } from "./payment-tracking/payment-tracking.component";
-import { MentorshipComponent } from "./mentorship/mentorship.component";
-import { ReportComponent } from "./report/report.component";
-import { LayoutComponent } from "./layout/layout.component";
 import { ComponentsComponent } from "./dashboard/components/components.component";
+import { LayoutComponent } from "./layout/layout.component";
+import { MentorshipComponent } from "./mentorship/mentorship.component";
+import { PaymentTrackingComponent } from "./payment-tracking/payment-tracking.component";
+import { ReportComponent } from "./report/report.component";
 import { SeanceManagementComponent } from "./seance-management/seance-management.component";
+import { UserManagementComponent } from "./user-management/components/user-management.component";
 import { DashboardconsultantComponent } from "./dashboardconsultant/components/dashboardconsultant.component";
-import { ConsultantRoute } from "./dashboardconsultant/consultant.route";
+import { DashboardMentorComponent } from "./dashboard-mentor/components/dashboard-mentor.component";
+import { LoginComponent } from "./login/components/login.component";
 
 export const routes: Routes = [
     {
         path: "login",
-        loadChildren: () => import("./login/login.routes").then(m => m.LoginRoute)
+        component: LoginComponent
     },
 
     {
@@ -21,8 +21,15 @@ export const routes: Routes = [
         component: LayoutComponent, // Le layout global avec le sidebar
         children: [
             { path: 'dashboard', component: ComponentsComponent },
-            { path: '', loadChildren: () => import("./mission-management/mission.routes").then(m => m.MissionRoutes) },
-            { path: 'users', loadChildren: () => import("./user-management/user.routes").then(m => m.UserRoute) },
+            {
+                path: '',
+                loadChildren: () => import("./mission-management/mission.routes").then(m => m.MissionRoutes)
+            },
+            {
+                path: "users",
+                component: UserManagementComponent
+            },
+
             { path: 'reports', component: ReportComponent },
             { path: 'seances', component: SeanceManagementComponent },
             { path: 'payments', component: PaymentTrackingComponent },
@@ -33,5 +40,14 @@ export const routes: Routes = [
         path: "dashboard/consultant",
         component: DashboardconsultantComponent,
         loadChildren: () => import("./dashboardconsultant/consultant.route").then(m => m.ConsultantRoute)
-    }
+    },
+  {
+    path: 'dashboard/mentor',
+    component: DashboardMentorComponent,
+    loadChildren: () => import("./dashboard-mentor/mentor.route").then(m => m.MentorRoute)
+  }
+    // {
+    //     path: "dashboard/mentor",
+    //     component: DashboardMentorComponent
+    // }
 ];

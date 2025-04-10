@@ -21,4 +21,12 @@ export class MentorService {
             catchError((err) => this.authServiceConf.handleError(err))
         )
     }
+
+    deleteMentor(mentorId: number): Observable<void> {
+      const headers = this.authServiceConf.createAuthHeaders()
+
+      return this.http.delete<void>(`${this.baseUrl}/forc-n/v1/mentors/${mentorId}`, { headers }).pipe(
+        catchError((err) => this.authServiceConf.handleError(err))
+      )
+    }
 }

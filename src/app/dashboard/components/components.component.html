@@ -1,4 +1,10 @@
 <!-- dashboard.component.html -->
+<div *ngIf="isLoading" class="fixed inset-0 z-50 bg-white/90 dark:bg-gray-900/90 flex items-center justify-center">
+    <div class="flex flex-col items-center gap-3">
+        <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        <span class="text-gray-600 dark:text-gray-300 font-medium">Chargement en cours...</span>
+    </div>
+</div>
 <div class="container mx-auto" *ngIf="!isLoading">
     <!-- En-tête de la page avec stats -->
     <div class="mb-8">
@@ -144,19 +150,33 @@
                 <!-- Filtre rapide -->
                 <div
                     class="px-6 pb-4 flex gap-2 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600">
-                    <button class="px-4 py-2 rounded-full text-xs bg-blue-500 text-white shadow-sm">Tous</button>
-                    <button
+                    <button [ngClass]="{'bg-blue-500 text-white': filterStatus === 'all'}" (click)="applyFilter('all')"
+                        class="px-4 py-2 rounded-full text-xs text-white shadow-sm">Tous</button>
+                    <button [ngClass]="{'bg-red-500  text-white': filterStatus === 'En Cours'}"
+                        (click)="applyFilter('En Cours')"
                         class="px-4 py-2 rounded-full text-xs bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600">En
                         cours</button>
-                    <button
+                    <button [ngClass]="{'bg-green-500 text-white': filterStatus === 'Terminée'}"
+                        (click)="applyFilter('Terminée')"
                         class="px-4 py-2 rounded-full text-xs bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600">Terminées</button>
-                    <button
+                    <button (click)="applyFilter('En attente')"
                         class="px-4 py-2 rounded-full text-xs bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600">En
                         attente</button>
                 </div>
 
-                <div class="overflow-x-auto">
-                    <table mat-table class="w-full" [dataSource]="dataSource" class="min-w-full">
+                <div class="overflow-x-auto relative min-h-[300px]">
+                    <div *ngIf="isFilterLoading"
+                        class="absolute inset-0 bg-white/90 dark:bg-gray-900/90 z-10 flex items-center justify-center rounded-lg">
+                        <div class="flex flex-col items-center gap-3">
+                            <div
+                                class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin">
+                            </div>
+                            <span class="text-gray-600 dark:text-gray-300 font-medium">Chargement...</span>
+                        </div>
+                    </div>
+
+                    <table mat-table class="w-full" [dataSource]="dataSource" class="min-w-full"
+                        *ngIf="!isFilterLoading">
                         <!-- Nom de la mission -->
                         <ng-container matColumnDef="name">
                             <th mat-header-cell *matHeaderCellDef
@@ -190,17 +210,17 @@
                                 <div class="flex items-center">
                                     <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full"
                                         [ngClass]="{
-                                    'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200': mission.status === 'Terminée',
-                                    'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200': mission.status === 'En cours',
-                                    'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200': mission.status === 'En attente'
+                                    'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200': mission.status_mission === 'Terminée',
+                                    'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200': mission.status_mission === 'En cours',
+                                    'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200': mission.status_mission === 'En attente'
                                 }">
                                         <span class="flex items-center">
                                             <span class="h-2 w-2 rounded-full mr-1.5" [ngClass]="{
-                                            'bg-green-500': mission.status === 'Terminée',
-                                            'bg-blue-500': mission.status === 'En cours',
-                                            'bg-gray-500': mission.status === 'En attente'
+                                            'bg-green-500': mission.status_mission === 'Terminée',
+                                            'bg-blue-500': mission.status_mission === 'En cours',
+                                            'bg-gray-500': mission.status_mission === 'En attente'
                                         }"></span>
-                                            {{mission.status}}
+                                            {{mission.status_mission}}
                                         </span>
                                     </span>
                                 </div>
@@ -217,9 +237,9 @@
                                 <div class="flex items-center">
                                     <div
                                         class="h-8 w-8 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-white mr-2 shadow-sm">
-                                        <span class="text-xs font-bold">{{mission.user.charAt(0)}}</span>
+                                        <span class="text-xs font-bold">{{mission?.utilisateur.nom.charAt(0)}}</span>
                                     </div>
-                                    <div class="font-medium">{{mission.user}}</div>
+                                    <div class="font-medium">{{mission?.utilisateur.nom}}</div>
                                 </div>
                             </td>
                         </ng-container>
@@ -234,7 +254,7 @@
                                 <div class="flex items-center">
                                     <mat-icon
                                         class="text-gray-400 dark:text-gray-500 mr-1 text-sm">calendar_today</mat-icon>
-                                    <span>{{mission.date}}</span>
+                                    <span>{{mission.dateDebut | date }}</span>
                                 </div>
                             </td>
                         </ng-container>
@@ -341,89 +361,42 @@
 
                 <div class="py-4 flex-1 overflow-y-auto">
                     <div class="relative">
-                        <!-- Timeline avec activités - redesign -->
                         <div class="ml-6 border-l-2 border-blue-100 dark:border-gray-700">
-                            <div
-                                class="relative pl-6 py-4 group hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-colors cursor-pointer">
-                                <div class="absolute -left-2.5 mt-1">
-                                    <div
-                                        class="h-5 w-5 rounded-full bg-blue-500 shadow-md flex items-center justify-center">
-                                        <mat-icon class="text-white text-xs">add_circle</mat-icon>
-                                    </div>
-                                </div>
-                                <div
-                                    class="text-sm font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                                    Nouvelle mission ajoutée</div>
-                                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">Il y a 12 minutes</div>
-                            </div>
+                            <div *ngFor="let item of timelineItems"
+                                class="relative pl-6 py-4 group hover:bg-{{item.color}}-50/50 dark:hover:bg-{{item.color}}-900/10 transition-colors cursor-pointer"
+                                (click)="onClick(item)">
 
-                            <div
-                                class="relative pl-6 py-4 group hover:bg-green-50/50 dark:hover:bg-green-900/10 transition-colors cursor-pointer">
+                                <!-- Icône -->
                                 <div class="absolute -left-2.5 mt-1">
                                     <div
-                                        class="h-5 w-5 rounded-full bg-green-500 shadow-md flex items-center justify-center">
-                                        <mat-icon class="text-white text-xs">check_circle</mat-icon>
+                                        class="h-5 w-5 rounded-full bg-{{item.color}}-500 shadow-md flex items-center justify-center">
+                                        <mat-icon class="text-white text-xs">{{item.icon}}</mat-icon>
                                     </div>
                                 </div>
-                                <div
-                                    class="text-sm font-medium text-gray-900 dark:text-white group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors">
-                                    Paiement validé pour <span class="font-semibold">Mission #13</span></div>
-                                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center">
-                                    <mat-icon class="text-xs mr-1">schedule</mat-icon> Il y a 2 heures
-                                </div>
-                            </div>
 
-                            <div
-                                class="relative pl-6 py-4 group hover:bg-purple-50/50 dark:hover:bg-purple-900/10 transition-colors cursor-pointer">
-                                <div class="absolute -left-2.5 mt-1">
-                                    <div
-                                        class="h-5 w-5 rounded-full bg-purple-500 shadow-md flex items-center justify-center">
-                                        <mat-icon class="text-white text-xs">people</mat-icon>
-                                    </div>
-                                </div>
+                                <!-- Contenu principal -->
                                 <div
-                                    class="text-sm font-medium text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
-                                    Session de mentorat créée</div>
+                                    class="text-sm font-medium text-gray-900 dark:text-white group-hover:text-{{item.color}}-600 dark:group-hover:text-{{item.color}}-400 transition-colors">
+                                    {{item.title | titlecase}}
+                                    <span *ngIf="item.extra?.subtitle"
+                                        class="font-semibold">{{item.extra?.subtitle}}</span>
+                                </div>
+
+                                <!-- Temps et badge -->
                                 <div class="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center">
-                                    <span class="flex items-center">
-                                        <mat-icon class="text-xs mr-1">schedule</mat-icon> Il y a 4 heures
+                                    <mat-icon class="text-xs mr-1">schedule</mat-icon>
+                                    {{item.time}}
+                                    <span *ngIf="item.extra?.badge"
+                                        class="ml-2 px-2 py-0.5 rounded-full bg-{{item.color}}-100 dark:bg-{{item.color}}-900/30 text-{{item.color}}-600 dark:text-{{item.color}}-300">
+                                        {{item.extra?.badge}}
                                     </span>
-                                    <span
-                                        class="ml-2 px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-300">Nouveau</span>
                                 </div>
-                            </div>
 
-                            <div
-                                class="relative pl-6 py-4 group hover:bg-amber-50/50 dark:hover:bg-amber-900/10 transition-colors cursor-pointer">
-                                <div class="absolute -left-2.5 mt-1">
-                                    <div
-                                        class="h-5 w-5 rounded-full bg-amber-500 shadow-md flex items-center justify-center">
-                                        <mat-icon class="text-white text-xs">assignment</mat-icon>
-                                    </div>
-                                </div>
-                                <div
-                                    class="text-sm font-medium text-gray-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
-                                    Rapport en attente de validation</div>
-                                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">Il y a 5 heures</div>
-                            </div>
-
-                            <div
-                                class="relative pl-6 py-4 group hover:bg-red-50/50 dark:hover:bg-red-900/10 transition-colors cursor-pointer">
-                                <div class="absolute -left-2.5 mt-1">
-                                    <div
-                                        class="h-5 w-5 rounded-full bg-red-500 shadow-md flex items-center justify-center">
-                                        <mat-icon class="text-white text-xs">cancel</mat-icon>
-                                    </div>
-                                </div>
-                                <div
-                                    class="text-sm font-medium text-gray-900 dark:text-white group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
-                                    Rapport rejeté pour <span class="font-semibold">Mission #8</span></div>
-                                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">Hier</div>
-                                <div
-                                    class="mt-2 p-2 rounded-lg bg-red-50 dark:bg-red-900/10 text-xs text-red-600 dark:text-red-300">
+                                <!-- Message d'avertissement -->
+                                <div *ngIf="item.extra?.warning"
+                                    class="mt-2 p-2 rounded-lg bg-{{item.color}}-50 dark:bg-{{item.color}}-900/10 text-xs text-{{item.color}}-600 dark:text-{{item.color}}-300">
                                     <div class="font-medium">Motif de rejet:</div>
-                                    <div class="mt-1">Données incorrectes. Veuillez vérifier les sources et soumettre à
-                                        nouveau.</div>
+                                    <div class="mt-1">{{item.extra?.warning}}</div>
                                 </div>
                             </div>
                         </div>
