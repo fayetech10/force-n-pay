@@ -2,7 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { AuthServiceConfig } from "./AuthServiceConfig";
 import { catchError, Observable } from "rxjs";
-import { Activity } from "../interfaces/Actiites";
+import { Activity } from "../interfaces/Activity";
 
 @Injectable({
     providedIn: "root"

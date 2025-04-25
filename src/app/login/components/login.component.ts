@@ -25,7 +25,7 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {
     // Redirige les utilisateurs déjà connectés
-    
+
   }
 
   login(): void {
@@ -38,12 +38,14 @@ export class LoginComponent implements OnInit {
         this.authService.getUserProfile().subscribe({
           next: (user) => {
             this.user = user
-            if (this.user.roles.includes("ADMIN")) {
+            if (this.user.roles.includes("ADMIN") && this.user.passwordUpdated === true) {
               this.router.navigate(["/dashboard"])
-            } else if (this.user.roles.includes("CONSULTANT")) {
+            } else if (this.user.roles.includes("CONSULTANT") && this.user.passwordUpdated === true) {
               this.router.navigate(["/dashboard/consultant"])
-            }else if(this.user.roles.includes("MENTOR")){
+            } else if (this.user.roles.includes("MENTOR") && this.user.passwordUpdated === true) {
               this.router.navigate(["/dashboard/mentor"])
+            } else if (this.user.passwordUpdated === false) {
+              this.router.navigate(['/password-update'])
             }
           },
           error: (error) => {

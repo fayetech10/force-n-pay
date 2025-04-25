@@ -159,7 +159,8 @@
                     <button [ngClass]="{'bg-green-500 text-white': filterStatus === 'Terminée'}"
                         (click)="applyFilter('Terminée')"
                         class="px-4 py-2 rounded-full text-xs bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600">Terminées</button>
-                    <button (click)="applyFilter('En attente')"
+                    <button [ngClass]="{'bg-yellow-500 text-indigo-50': filterStatus === 'En attente'}"
+                        (click)="applyFilter('En attente')"
                         class="px-4 py-2 rounded-full text-xs bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600">En
                         attente</button>
                 </div>
@@ -175,109 +176,110 @@
                         </div>
                     </div>
 
-                    <table mat-table class="w-full" [dataSource]="dataSource" class="min-w-full"
+                    <table mat-table [dataSource]="dataSource" class="w-full shadow-sm rounded-xl overflow-hidden"
                         *ngIf="!isFilterLoading">
                         <!-- Nom de la mission -->
                         <ng-container matColumnDef="name">
-                            <th mat-header-cell *matHeaderCellDef
-                                class="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                Nom
+                            <th mat-header-cell *matHeaderCellDef class="px-6 py-5 bg-gray-50 dark:bg-gray-800">
+                                <span class="text-xs font-medium text-gray-500 dark:text-gray-400">NOM</span>
                             </th>
-                            <td mat-cell *matCellDef="let mission" class="px-6 py-4">
-                                <div class="flex items-center">
-                                    <div
-                                        class="h-10 w-10 rounded-lg flex-shrink-0 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 flex items-center justify-center mr-3">
-                                        <mat-icon
-                                            [ngClass]="'text-' + (mission.color || 'blue') + '-500'">{{mission.icon ||
-                                            'work'}}</mat-icon>
-                                    </div>
-                                    <div>
-                                        <div class="font-medium text-gray-900 dark:text-white">{{mission.name ||
-                                            "Mission123"}}</div>
-                                        <div class="text-xs text-gray-500 dark:text-gray-400">ID: {{mission.id}}</div>
-                                    </div>
+                            <td mat-cell *matCellDef="let mission"
+                                class="px-6 py-5 border-t border-gray-100 dark:border-gray-700">
+                                <div>
+                                    <div class="font-medium text-gray-900 dark:text-white">{{mission.name ||
+                                        "Mission123"}}</div>
+                                    <div class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">#{{mission.id}}</div>
                                 </div>
                             </td>
                         </ng-container>
 
                         <!-- Statut -->
                         <ng-container matColumnDef="status">
-                            <th mat-header-cell *matHeaderCellDef
-                                class="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                Statut
+                            <th mat-header-cell *matHeaderCellDef class="px-6 py-5 bg-gray-50 dark:bg-gray-800">
+                                <span class="text-xs font-medium text-gray-500 dark:text-gray-400">STATUT</span>
                             </th>
-                            <td mat-cell *matCellDef="let mission" class="px-6 py-4">
-                                <div class="flex items-center">
-                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full"
-                                        [ngClass]="{
-                                    'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200': mission.status_mission === 'Terminée',
-                                    'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200': mission.status_mission === 'En cours',
-                                    'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200': mission.status_mission === 'En attente'
+                            <td mat-cell *matCellDef="let mission"
+                                class="px-6 py-5 border-t border-gray-100 dark:border-gray-700">
+                                <span class="px-3 py-1.5 inline-flex text-xs font-medium rounded-full" [ngClass]="{
+                                    'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400 ring-1 ring-green-600/20': mission.status_mission === 'Terminée',
+                                    'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 ring-1 ring-blue-600/20': mission.status_mission === 'En cours',
+                                    'bg-gray-50 text-gray-700 dark:bg-gray-800 dark:text-gray-400 ring-1 ring-gray-600/10': mission.status_mission === 'En attente'
                                 }">
-                                        <span class="flex items-center">
-                                            <span class="h-2 w-2 rounded-full mr-1.5" [ngClass]="{
+                                    <span class="flex items-center">
+                                        <span class="h-1.5 w-1.5 rounded-full mr-1.5" [ngClass]="{
                                             'bg-green-500': mission.status_mission === 'Terminée',
                                             'bg-blue-500': mission.status_mission === 'En cours',
-                                            'bg-gray-500': mission.status_mission === 'En attente'
+                                            'bg-gray-400': mission.status_mission === 'En attente'
                                         }"></span>
-                                            {{mission.status_mission}}
-                                        </span>
+                                        {{mission.status_mission}}
                                     </span>
-                                </div>
+                                </span>
                             </td>
                         </ng-container>
 
                         <!-- Utilisateur -->
                         <ng-container matColumnDef="user">
-                            <th mat-header-cell *matHeaderCellDef
-                                class="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                Utilisateur
+                            <th mat-header-cell *matHeaderCellDef class="px-6 py-5 bg-gray-50 dark:bg-gray-800">
+                                <span class="text-xs font-medium text-gray-500 dark:text-gray-400">UTILISATEUR</span>
                             </th>
-                            <td mat-cell *matCellDef="let mission" class="px-6 py-4">
+                            <td mat-cell *matCellDef="let mission"
+                                class="px-6 py-5 border-t border-gray-100 dark:border-gray-700">
                                 <div class="flex items-center">
-                                    <div
-                                        class="h-8 w-8 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-white mr-2 shadow-sm">
-                                        <span class="text-xs font-bold">{{mission?.utilisateur.nom.charAt(0)}}</span>
+                                    <div class="relative">
+                                        <div
+                                            class="h-9 w-9 rounded-full bg-gradient-to-tr from-violet-500 to-fuchsia-500 flex items-center justify-center text-white shadow-md">
+                                            <span
+                                                class="text-xs font-semibold">{{mission?.utilisateur.nom.charAt(0)}}</span>
+                                        </div>
+                                        <span
+                                            class="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full ring-2 ring-white dark:ring-gray-900 bg-green-400"></span>
                                     </div>
-                                    <div class="font-medium">{{mission?.utilisateur.nom}}</div>
+                                    <div class="ml-3">
+                                        <div class="font-medium text-gray-900 dark:text-white">
+                                            {{mission?.utilisateur.nom}}</div>
+                                        <div class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Assigné</div>
+                                    </div>
                                 </div>
                             </td>
                         </ng-container>
 
                         <!-- Date de début -->
                         <ng-container matColumnDef="date">
-                            <th mat-header-cell *matHeaderCellDef
-                                class="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                Date
+                            <th mat-header-cell *matHeaderCellDef class="px-6 py-5 bg-gray-50 dark:bg-gray-800">
+                                <span class="text-xs font-medium text-gray-500 dark:text-gray-400">DATE</span>
                             </th>
-                            <td mat-cell *matCellDef="let mission" class="px-6 py-4 text-gray-600 dark:text-gray-300">
-                                <div class="flex items-center">
-                                    <mat-icon
-                                        class="text-gray-400 dark:text-gray-500 mr-1 text-sm">calendar_today</mat-icon>
-                                    <span>{{mission.dateDebut | date }}</span>
+                            <td mat-cell *matCellDef="let mission"
+                                class="px-6 py-5 border-t border-gray-100 dark:border-gray-700">
+                                <div class="flex items-center text-gray-700 dark:text-gray-300">
+                                    <div
+                                        class="h-8 w-8 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center mr-2">
+
+                                    </div>
+                                    <span>{{mission.dateDebut | date:'dd/MM/yy'}}</span>
                                 </div>
                             </td>
                         </ng-container>
 
                         <!-- Progression -->
                         <ng-container matColumnDef="progress">
-                            <th mat-header-cell *matHeaderCellDef
-                                class="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                Progression
+                            <th mat-header-cell *matHeaderCellDef class="px-6 py-5 bg-gray-50 dark:bg-gray-800">
+                                <span class="text-xs font-medium text-gray-500 dark:text-gray-400">PROGRESSION</span>
                             </th>
-                            <td mat-cell *matCellDef="let mission" class="px-6 py-4">
+                            <td mat-cell *matCellDef="let mission"
+                                class="px-6 py-5 border-t border-gray-100 dark:border-gray-700">
                                 <div>
-                                    <div class="flex items-center justify-between mb-1">
+                                    <div class="flex items-center justify-between mb-1.5">
                                         <span
-                                            class="text-xs font-medium text-gray-700 dark:text-gray-300">{{mission.progress
-                                            || 65}}%</span>
+                                            class="text-xs font-semibold text-gray-700 dark:text-gray-300">{{mission.progress
+                                            ||
+                                            65}}%</span>
                                     </div>
-                                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
-                                        <div class="h-1.5 rounded-full" [ngClass]="{
-                                        'bg-green-500': mission.progress >= 80,
-                                        'bg-blue-500': mission.progress >= 40 && mission.progress < 80,
-                                        'bg-amber-500': mission.progress < 40
-                                    }" [style.width.%]="mission.progress || 65"></div>
+                                    <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2">
+                                        <div class="h-2 rounded-full transition-all duration-500" [ngClass]="{
+                                            'bg-gradient-to-r from-emerald-400 to-teal-500': mission.progress >= 80,
+                                            'bg-gradient-to-r from-blue-400 to-indigo-500': mission.progress >= 40 && mission.progress < 80,
+                                            'bg-gradient-to-r from-amber-400 to-orange-500': mission.progress < 40
+                                        }" [style.width.%]="mission.progress || 65"></div>
                                     </div>
                                 </div>
                             </td>
@@ -285,57 +287,91 @@
 
                         <!-- Actions -->
                         <ng-container matColumnDef="actions">
-                            <th mat-header-cell *matHeaderCellDef
-                                class="px-6 py-4 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                Actions
+                            <th mat-header-cell *matHeaderCellDef class="px-6 py-5 bg-gray-50 dark:bg-gray-800">
+                                <span
+                                    class="text-xs font-medium text-gray-500 dark:text-gray-400 text-right block">ACTIONS</span>
                             </th>
-                            <td mat-cell *matCellDef="let mission" class="px-6 py-4 text-right">
+                            <td mat-cell *matCellDef="let mission"
+                                class="px-6 py-5 border-t border-gray-100 dark:border-gray-700 text-right">
                                 <button mat-icon-button [matMenuTriggerFor]="actionMenu"
-                                    class="rounded-full h-8 w-8 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                                    <mat-icon class="text-gray-600 dark:text-gray-300">more_horiz</mat-icon>
+                                    class="rounded-lg h-9 w-9 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-900">
+                                    <mat-icon class="text-gray-500 dark:text-gray-400">more_vert</mat-icon>
                                 </button>
-                                <mat-menu #actionMenu="matMenu" class="rounded-xl overflow-hidden">
-                                    <div class="p-2">
-                                        <button mat-menu-item class="rounded-lg h-10 my-1">
-                                            <mat-icon class="text-blue-500">edit</mat-icon>
-                                            <span>Modifier</span>
+                                <mat-menu #actionMenu="matMenu" class="rounded-xl overflow-hidden min-w-48">
+                                    <div class="p-1">
+                                        <button mat-menu-item
+                                            class="rounded-lg h-10 my-1 hover:bg-gray-50 dark:hover:bg-gray-800">
+                                            <div class="flex items-center">
+                                                <div
+                                                    class="h-8 w-8 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center mr-2">
+                                                    <mat-icon class="text-blue-500">edit</mat-icon>
+                                                </div>
+                                                <span>Modifier</span>
+                                            </div>
                                         </button>
-                                        <button mat-menu-item class="rounded-lg h-10 my-1">
-                                            <mat-icon class="text-purple-500">visibility</mat-icon>
-                                            <span>Voir Détails</span>
+                                        <button mat-menu-item
+                                            class="rounded-lg h-10 my-1 hover:bg-gray-50 dark:hover:bg-gray-800">
+                                            <div class="flex items-center">
+                                                <div
+                                                    class="h-8 w-8 rounded-lg bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center mr-2">
+                                                    <mat-icon class="text-purple-500">visibility</mat-icon>
+                                                </div>
+                                                <span>Voir Détails</span>
+                                            </div>
                                         </button>
                                         <div class="border-t border-gray-100 dark:border-gray-700 my-1"></div>
-                                        <button mat-menu-item class="rounded-lg h-10 my-1 text-red-500">
-                                            <mat-icon>delete</mat-icon>
-                                            <span>Supprimer</span>
+                                        <button mat-menu-item
+                                            class="rounded-lg h-10 my-1 hover:bg-red-50 dark:hover:bg-red-900/10">
+                                            <div class="flex items-center">
+                                                <div
+                                                    class="h-8 w-8 rounded-lg bg-red-50 dark:bg-red-900/20 flex items-center justify-center mr-2">
+                                                    <mat-icon class="text-red-500">delete</mat-icon>
+                                                </div>
+                                                <span class="text-red-600 dark:text-red-400">Supprimer</span>
+                                            </div>
                                         </button>
                                     </div>
                                 </mat-menu>
                             </td>
                         </ng-container>
 
-                        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns"
+                            class="border-b border-gray-200 dark:border-gray-700"></tr>
                         <tr mat-row *matRowDef="let row; columns: displayedColumns;"
-                            class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"></tr>
+                            class="hover:bg-gray-50/70 dark:hover:bg-gray-800/50 transition-colors cursor-pointer"></tr>
                     </table>
                 </div>
 
-                <div class="flex justify-between items-center p-6 border-t border-gray-200 dark:border-gray-700">
-                    <div class="text-sm text-gray-500 dark:text-gray-400">Affichant <span
-                            class="font-medium text-gray-900 dark:text-white">4</span> sur <span
-                            class="font-medium text-gray-900 dark:text-white">42</span> missions</div>
-                    <div class="flex gap-2">
-                        <button mat-icon-button disabled
-                            class="h-8 w-8 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center">
-                            <mat-icon class="text-gray-400">chevron_left</mat-icon>
+                <div class="flex flex-col sm:flex-row justify-between items-center p-4 border-t border-gray-200 dark:border-gray-700 gap-4"
+                    *ngIf="!isFilterLoading">
+                    <!-- Compteur d'éléments -->
+                    <div class="text-sm text-gray-500 dark:text-gray-400">
+                        Affichage <span class="font-medium text-gray-900 dark:text-white">{{ dataSource.length }}</span>
+                        résultats sur <span class="font-medium text-gray-900 dark:text-white">{{ totalMissions }}</span>
+                    </div>
+
+                    <!-- Contrôles de pagination -->
+                    <div class="flex items-center gap-1">
+                        <!-- Bouton précédent -->
+                        <button mat-icon-button [disabled]="pageIndex === 0" (click)="prevPage()"
+                            class="h-9 w-9 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent">
+                            <mat-icon class="text-gray-600 dark:text-gray-300">chevron_left</mat-icon>
                         </button>
-                        <button mat-icon-button
-                            class="h-8 w-8 rounded-full bg-blue-500 text-white flex items-center justify-center shadow-sm">1</button>
-                        <button mat-icon-button
-                            class="h-8 w-8 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700">2</button>
-                        <button mat-icon-button
-                            class="h-8 w-8 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700">
-                            <mat-icon>chevron_right</mat-icon>
+
+                        <!-- Pages -->
+                        <div class="flex items-center gap-1 mx-2">
+                            <button *ngFor="let _ of [].constructor(totalPages); let i = index" (click)="goToPage(i)"
+                                class="h-9 min-w-[36px] px-2 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center justify-center text-sm font-medium transition-colors hover:bg-gray-50 dark:hover:bg-gray-800"
+                                [class.bg-blue-500]="pageIndex === i" [class.border-blue-500]="pageIndex === i"
+                                [class.text-white]="pageIndex === i" [class.hover:bg-blue-600]="pageIndex === i">
+                                {{ i + 1 }}
+                            </button>
+                        </div>
+
+                        <!-- Bouton suivant -->
+                        <button mat-icon-button [disabled]="pageIndex === totalPages - 1" (click)="nextPage()"
+                            class="h-9 w-9 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent">
+                            <mat-icon class="text-gray-600 dark:text-gray-300">chevron_right</mat-icon>
                         </button>
                     </div>
                 </div>

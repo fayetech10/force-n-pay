@@ -30,8 +30,6 @@ import { User } from '../interfaces/User';
     MatListModule,
     TitleCasePipe,
     MatExpansionModule
-
-
   ],
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.scss'
@@ -62,8 +60,6 @@ export class LayoutComponent implements OnInit, OnDestroy {
     { path: '/users/validation-team', icon: 'verified_user', title: 'Équipe de validation' },
     { path: '/users/admin', icon: 'admin_panel_settings', title: 'Admin' }
   ];
-
-
   notifications = [
     { title: 'Nouvelle mission ajoutée', time: 'Il y a 5 minutes', icon: "" },
     { title: 'Rapport soumis', time: 'Il y a 2 heures', icon: "" },
@@ -83,9 +79,6 @@ export class LayoutComponent implements OnInit, OnDestroy {
     private readonly authService: AuthService,
     private activatedRoute: ActivatedRoute,
     private router: Router) { }
-
-
-
   ngOnInit(): void {
     this.checkAuthentication()
     this.loadProfile()
@@ -100,7 +93,7 @@ export class LayoutComponent implements OnInit, OnDestroy {
     this.isLoading = true
     this.authService.getUserProfile()
      
-      .subscribe({
+  .subscribe({
         next: (user) => {
           this.user = user
           if (!this.user.roles.includes("ADMIN")) {
@@ -141,18 +134,13 @@ export class LayoutComponent implements OnInit, OnDestroy {
     // Extraire le nom de la page à partir de l'URL actuelle
     const url = this.router.url;
     const segments = url.split('/').filter(segment => segment);
-
     if (segments.length === 0) {
       return 'Dashboard';
     }
-
-
-
     // Convertir première lettre en majuscule et remplacer les tirets par des espaces
     return segments[segments.length - 1]
       .replace(/-/g, ' ')
       .replace(/\b\w/g, char => char.toUpperCase());
-
   }
   loadProfile(): void {
     this.authService.getUserProfile()

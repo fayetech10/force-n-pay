@@ -2,11 +2,12 @@ import { Cohorte } from "./Cohorte";
 import { User } from "./User";
 
 export interface Seance {
-    heureDebut: string;
-    heureFin: string;
-    date: string;
-    activite: string;
-    heuresTotaux: string;
+    id: number | null,
+    heureDebut: string | undefined;
+    heureFin: string | undefined;
+    date: Date | null | undefined;
+    activite: string | undefined;
+    heuresTotaux: string ;
     cohorte: Cohorte;
     utilisateur: User;
 }

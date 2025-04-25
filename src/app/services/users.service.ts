@@ -37,9 +37,10 @@ export class UserService {
         )
     }
 
-    refreshUsers(): void {
-        this.http.get<User[]>(`${this.baseUrl}/forc-n/v1/users`)
-            .subscribe(users => this.userSubjects.next(users));
+    refreshUsers(): Observable<User[]> {
+        return this.http.get<User[]>(`${this.baseUrl}/forc-n/v1/users`, { headers: this.authServiceConf.createAuthHeaders() }).pipe(
+            catchError(err => this.authServiceConf.handleError(err))
+        )
     }
 
     deleteUser(id: number): Observable<void> {
@@ -70,6 +71,11 @@ export class UserService {
 
     addUser(userData: User): Observable<User> {
         return this.http.post<User>(`${this.baseUrl}/forc-n/v1/user/add`, userData, { headers: this.authServiceConf.createAuthHeaders() }).pipe(
+            catchError((err) => this.authServiceConf.handleError(err))
+        )
+    }
+    update(user: User): Observable<User> {
+        return this.http.post<User>(`${this.baseUrl}/forc-n/v1/user/update/${user.id}`, user, { headers: this.authServiceConf.createAuthHeaders() }).pipe(
             catchError((err) => this.authServiceConf.handleError(err))
         )
     }

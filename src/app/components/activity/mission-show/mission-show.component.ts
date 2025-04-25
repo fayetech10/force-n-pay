@@ -1,6 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { Activity } from '../../../interfaces/Actiites';
+import { Activity } from '../../../interfaces/Activity';
 import { CommonModule } from '@angular/common';
 import { Mission } from '../../../interfaces/Mission';
 

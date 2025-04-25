@@ -5,8 +5,8 @@ import { Seance } from "./Seance";
 export interface Activity {
     id?: number;
     name: string;
-    date?: string;
-    missionId?: number;
+    date: Date;
+    mission?: Mission;
     paiement?:  null;
     seance?: Seance | null;
     rapport?:  null;

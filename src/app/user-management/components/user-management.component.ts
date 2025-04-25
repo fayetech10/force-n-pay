@@ -26,13 +26,14 @@ import { JsonPatchOperation } from '../../interfaces/JsonPatchOperation';
 import { FormUserAddComponent } from '../../components/form-user-add/form-user-add.component';
 import { MatMenu, MatMenuTrigger } from '@angular/material/menu';
 import { UserDataService } from '../../services/components/UsersDataService.service';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 @Component({
   selector: 'app-user-management',
   imports: [
     MatCardModule,
     MatListModule,
-
+    MatSlideToggleModule,
     MatChipsModule,
     MatDividerModule,
     CommonModule,
@@ -54,6 +55,7 @@ import { UserDataService } from '../../services/components/UsersDataService.serv
 
 export class UserManagementComponent implements OnInit, OnDestroy {
   sortBy: any;
+  userActions: any;
   userInitials(_t135: any) {
     throw new Error('Method not implemented.');
   }

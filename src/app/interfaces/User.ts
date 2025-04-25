@@ -16,4 +16,6 @@ nombreSeanceFaits: any;
     hourlyRate: number;
     roles: string[];
     lastActivity: Date
+    passwordUpdated: boolean;
+    createdAt: Date
 }

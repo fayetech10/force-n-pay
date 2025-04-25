@@ -68,7 +68,8 @@ export class FormUserAddComponent {
       nom: ['', [Validators.required, Validators.maxLength(50)]],
       email: ['', [Validators.required, Validators.email]],
       telephone: ['', [Validators.required, phoneValidator]],
-      address: ['', [Validators.required, Validators.maxLength(200)]]
+      address: ['', [Validators.required, Validators.maxLength(200)]],
+
     });
 
     this.professionalInfoForm = this.fb.group({
@@ -82,7 +83,9 @@ export class FormUserAddComponent {
       username: ['', [Validators.required, Validators.minLength(4)]],
       password: ['', [Validators.required, Validators.minLength(8)]],
       isActive: [true],
-      biometricAuth: [false]
+      biometricAuth: [false],
+      isMentor: [false],
+      termsAccepted: [false, Validators.requiredTrue]
     });
 
     // Surveillance des changements du mot de passe

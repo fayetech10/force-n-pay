@@ -31,14 +31,8 @@ import { UserService } from '../../services/users.service';
 import { MissionDetailsComponentComponent } from '../../components/mission-details-component/mission-details-component.component';
 import { TruncatePipe } from "../../TruncatePipe";
 import { animate, query, stagger, style, transition, trigger } from '@angular/animations';
-import { Activity } from '../../interfaces/Actiites';
+import { Activity } from '../../interfaces/Activity';
 import { ActivitesService } from '../../services/activites.service';
-
-// interface User {
-//   id: number;
-//   name: string;
-//   role: string;
-// }
 
 @Component({
   selector: 'app-mission-management',
@@ -357,7 +351,11 @@ export class MissionManagementComponent implements OnInit, OnDestroy {
   }
   saveMission(): void {
     this.isSaving = true;
-    if (this.missionForm.invalid) return;
+
+    if (this.missionForm.invalid) {
+      this.isSaving = false;
+      return;
+    }
 
     const missionData: Mission = this.missionForm.value;
     const operation$ = this.editMode && this.currentMissionId !== null
@@ -369,12 +367,8 @@ export class MissionManagementComponent implements OnInit, OnDestroy {
       switchMap(savedMission => {
         const activity: Activity = {
           name: 'Nouvelle mission ajoutée',
-          date: new Date().toISOString(), // Date obligatoire
-          missionId: savedMission.id,
-          // Ajouter les propriétés obligatoires manquantes
-          paiement: null,
-          seance: null,
-          rapport: null
+          date: new Date(),
+          mission: savedMission
         };
         return this.activityService.addActivity(activity);
       })
@@ -388,10 +382,11 @@ export class MissionManagementComponent implements OnInit, OnDestroy {
         this.dialog.closeAll();
       },
       error: (error) => {
-        console.error(`Erreur ${this.editMode ? 'mise à jour' : 'ajout'}`, error);
+        console.error(`Erreur lors de la ${this.editMode ? 'mise à jour' : 'création'} de la mission`, error);
       }
     });
   }
+
   refreshMissionsData(updatedMission: Mission) {
     this.missionService.getMissions().subscribe(missions => {
       const dataSource = this.missions.data;

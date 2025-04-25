@@ -1,25 +1,23 @@
-.animate-gradient-x {
-    background-size: 200% 200%;
-    animation: gradient-x 3s ease infinite;
+@keyframes ping-slow {
+  0% { transform: scale(0.9); opacity: 1; }
+  100% { transform: scale(2.5); opacity: 0; }
 }
 
-@keyframes gradient-x {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+.animate-ping-slow {
+  animation: ping-slow 2s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
 
-.animate-fade-in-up {
-    animation: fade-in-up 0.4s ease-out;
+.ease-out-expo {
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes fade-in-up {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+@keyframes gradient-x-fast {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-gradient-x-fast {
+  background-size: 200% auto;
+  animation: gradient-x-fast 5s ease infinite;
 }

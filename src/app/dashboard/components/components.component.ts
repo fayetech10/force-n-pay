@@ -21,7 +21,7 @@ import { AuthService } from '../../services/auth.service';
 import { MissionService } from '../../services/missions.service';
 import { Mission } from '../../interfaces/Mission';
 import { ActivitesService } from '../../services/activites.service';
-import { Activity } from '../../interfaces/Actiites';
+import { Activity } from '../../interfaces/Activity';
 import { TimelineItem } from '../../interfaces/TimelineItem';
 import { MatDialog } from '@angular/material/dialog';
 import { MissionShowComponent } from '../../components/activity/mission-show/mission-show.component';
@@ -93,6 +93,61 @@ export class ComponentsComponent implements OnInit {
   activitiess: Activity[] = []
   timelineItems: TimelineItem[] = []
 
+
+  // Pagination
+  pageSize = 6;
+  pageIndex = 0;
+
+  get totalMissions(): number {
+    return this.missions.length
+  }
+  get totalPages(): number {
+    return Math.ceil(this.totalMissions / this.pageSize)
+  }
+  get currentPage(): number {
+
+    return this.pageIndex + 1
+  }
+  /**
+  * Met à jour l'affichage en fonction de la page courante
+  */
+  updateDataSource(): void {
+    const start = this.pageIndex * this.pageSize;
+    this.dataSource = this.missions.slice(start, start + this.pageSize);
+  }
+
+  /**
+   * Aller à une page spécifique
+   */
+  goToPage(index: number): void {
+    if (index < 0 || index >= this.totalPages) {
+      return;
+    }
+    this.pageIndex = index;
+    this.updateDataSource();
+  }
+
+  /**
+   * Page suivante
+   */
+  nextPage(): void {
+    if (this.pageIndex < this.totalPages - 1) {
+      this.goToPage(this.pageIndex + 1);
+    }
+  }
+
+  /**
+   * Page précédente
+   */
+  prevPage(): void {
+    if (this.pageIndex > 0) {
+      this.goToPage(this.pageIndex - 1);
+    }
+  }
+
+  getPagesArray(): number[] {
+    return Array(this.totalPages).fill(0).map((x, i) => i);
+  }
 
   missionStatus: string = ''
 
@@ -247,7 +302,6 @@ export class ComponentsComponent implements OnInit {
         this.activitiess = activities
           .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
           .slice(0, 5);
-
         this.processActivitiesToTimeline();
       },
       error: (err) => {
@@ -266,7 +320,7 @@ export class ComponentsComponent implements OnInit {
       } else if (activity.seance) {
         typeConfig = this.getSessionConfig(activity.seance);
       } else if (activity.paiement) {
-        typeConfig = this.getPaymentConfig(activity.paiement);
+        typeConfig = this.getPaymentConfig(activity);
       } else if (activity.rapport) {
         typeConfig = this.getReportConfig(activity.rapport);
       }
@@ -344,7 +398,7 @@ export class ComponentsComponent implements OnInit {
     this.isLoading = true
     this.missionService.getMissions().subscribe({
       next: (missions) => {
-        this.allMissions = missions.slice(0, 6)
+        this.allMissions = missions
         this.applyFilter('all')
         setTimeout(() => {
           this.isLoading = false
@@ -369,7 +423,9 @@ export class ComponentsComponent implements OnInit {
         missionsFiltrées = this.allMissions.filter(m => m.status_mission === status);
       }
 
-      this.dataSource = missionsFiltrées;
+      this.missions = missionsFiltrées;
+      this.pageIndex = 0
+      this.updateDataSource()
       this.isFilterLoading = false;
     }, 100);
   }

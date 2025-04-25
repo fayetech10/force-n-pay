@@ -6,6 +6,7 @@ import { User } from '../interfaces/User';
 import { AuthResponse } from '../interfaces/AuthResponse';
 import { environment } from '../../environments/environment';
 import { Router } from '@angular/router';
+import { AuthServiceConfig } from './AuthServiceConfig';
 
 @Injectable({
   providedIn: 'root'
@@ -14,8 +15,10 @@ export class AuthService {
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
   private apiUrl = environment.apiUrl;
+  private baseUrl = '/api'
 
-  constructor(private router: Router, private http: HttpClient) {
+  constructor(
+    private authServiceConf: AuthServiceConfig, private router: Router, private http: HttpClient) {
     // Initialise l'utilisateur au démarrage si token valide
     const token = this.getToken();
     if (token) {
@@ -100,5 +103,25 @@ export class AuthService {
     this.currentUserSubject.next(null);
     sessionStorage.clear();
     this.router.navigate(['/login']);
+  }
+
+  updatePassword(oldPassword: string, newPassword: string, confirmationPassword: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/auth/updatePassword`, { oldPassword, newPassword, confirmationPassword }, {
+      headers: this.authServiceConf.createAuthHeaders()
+    }).pipe(
+      catchError((err: HttpErrorResponse) => {
+        const errorMessage = err.error?.error || 'Erreur inconnue'
+        return throwError(() => new Error(errorMessage))
+      })
+    )
+  }
+  updateUser(userId: number, passwordUpdated: boolean): Observable<User> {
+    const body = {passwordUpdated}
+    return this.http.put<User>(`${this.baseUrl}/forc-n/v1/user/update/updated/${userId}`, body, { headers: this.authServiceConf.createAuthHeaders() }).pipe(
+      catchError((err: HttpErrorResponse) => {
+        const errorMessage = err.error?.error || "Erreur lors de la mise à jour du statut"
+        return throwError(() => new Error(errorMessage))
+      })
+    )
   }
 }

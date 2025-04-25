@@ -19,13 +19,13 @@ import { SeanceService } from '../services/seance.service';
     MatButtonModule,
     MatDividerModule
   ],
-  templateUrl:'./seance-management.component.html',
+  templateUrl: './seance-management.component.html',
   styleUrl: './seance-management.component.scss'
 })
 export class SeanceManagementComponent implements OnInit {
 
   seances: Seance[] = []
-  constructor(private readonly seanceService: SeanceService){}
+  constructor(private readonly seanceService: SeanceService) { }
   ngOnInit(): void {
     this.loadSeances()
   }
@@ -41,14 +41,14 @@ export class SeanceManagementComponent implements OnInit {
     })
   }
 
-  formatDate(dateString: string): string {
+  formatDate(dateString?: string): string {
     const options: Intl.DateTimeFormatOptions = {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
       day: 'numeric'
     };
-    return new Date(dateString).toLocaleDateString('fr-FR', options);
+    return new Date(dateString!).toLocaleDateString('fr-FR', options);
   }
 
   formatTime(timeString: string): string {
